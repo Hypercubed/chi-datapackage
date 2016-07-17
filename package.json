@@ -1,0 +1,64 @@
+{
+  "name": "chi-datapackage",
+  "version": "1.0.0",
+  "description": "Normalize datapackage and datapackage resources",
+  "main": "index.js",
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "test": "xo && ava"
+  },
+  "author": "J. Harshbarger",
+  "license": "MIT",
+  "devDependencies": {
+    "ava": "^0.15.2",
+    "xo": "^0.16.0"
+  },
+  "xo": {
+    "esnext": true,
+    "space": 2,
+    "envs": [
+      "node",
+      "browser"
+    ],
+    "rules": {
+      "import/no-extraneous-dependencies": 0,
+      "space-before-function-paren": [
+        2,
+        {
+          "anonymous": "always",
+          "named": "always"
+        }
+      ],
+      "no-warning-comments": 0,
+      "babel/new-cap": [
+        2,
+        {
+          "capIsNewExceptions": [
+            "Polymer"
+          ]
+        }
+      ]
+    }
+  },
+  "dependencies": {
+    "deep-extend": "^0.4.1",
+    "mime-lookup": "0.0.2",
+    "urijs": "^1.18.1"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hypercubed/chi-datapackage.git"
+  },
+  "keywords": [
+    "datapackage"
+  ],
+  "bugs": {
+    "url": "https://github.com/Hypercubed/chi-datapackage/issues"
+  },
+  "homepage": "https://github.com/Hypercubed/chi-datapackage#readme"
+}
