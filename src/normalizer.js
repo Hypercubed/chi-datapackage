@@ -86,6 +86,4 @@ function index (datapackage) {
   return datapackage;
 }
 
-module.exports = {
-  Normalizer
-};
+module.exports = Normalizer;

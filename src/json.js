@@ -1,4 +1,4 @@
-const {parse} = require('json5');
+const parse = require('json5').parse;
 
 module.exports = function fromJson (json) {
   if (typeof json === 'string') {

@@ -11,4 +11,5 @@ _\( managed using [todo-md](https://github.com/Hypercubed/todo-md) \)_
 - [x] Schema processor
   - [ ] Test each cast
   - [ ] Support type formats
+  - [ ] Field Constraints?
 - [ ] Loader?

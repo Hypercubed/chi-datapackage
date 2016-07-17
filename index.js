@@ -1,14 +1,20 @@
-const {Normalizer} = require('./src/normalizer');
-const {processPackage, processResource} = require('./src/processors.js');
+const Normalizer = require('./src/normalizer');
+const Processor = require('./src/processor.js');
+const SchemaProcessor = require('./src/schema');
+
 const mimeDb = require('./src/mime.json');
+const translators = require('./src/translators');
+const types = require('./src/types');
 
 const normalize = new Normalizer({mimeDb});
+const schemaProcessor = new SchemaProcessor({types});
+const processor = new Processor({translators, schemaProcessor});
 
 module.exports = {
   Normalizer,
-  normalize,
+  Processor,
   normalizePackage: normalize.datapackage.bind(normalize),
   normalizeResource: normalize.resource.bind(normalize),
-  processPackage,
-  processResource
+  processPackage: processor.datapackage.bind(processor),
+  processResource: processor.resource.bind(processor)
 };
