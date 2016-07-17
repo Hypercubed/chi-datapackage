@@ -1,14 +1,12 @@
 import test from 'ava';
 
-import {Normalizer} from '../';
+import {normalizePackage} from '../';
 import loader from '../src/loader';
-
-const normalize = new Normalizer();
 
 test('normalize bare datapackage', async t => {
   const s = await loader('./fixtures/bare/datapackage.json');
 
-  const p = normalize.datapackage(s);
+  const p = normalizePackage(s);
   t.not(p, s, 'creates a new object');
   t.not(p.resources, s.resources, 'creates a new resources array');
   t.is(p.path, './fixtures/bare/datapackage.json', 'adds path');
@@ -22,7 +20,7 @@ test('normalize bare datapackage', async t => {
 test('normalize simple datapackage', async t => {
   const s = await loader('./fixtures/simple/datapackage.json');
 
-  const p = normalize.datapackage(s);
+  const p = normalizePackage(s);
   t.not(p, s, 'creates a new object');
   t.not(p.resources, s.resources, 'creates a new resources array');
   t.is(p.path, './fixtures/simple/datapackage.json', 'adds path');
@@ -38,7 +36,7 @@ test('normalize simple datapackage', async t => {
 test('normalize dpm generated datapackage', async t => {
   const s = await loader('./fixtures/dpm/datapackage.json');
 
-  const p = normalize.datapackage(s);
+  const p = normalizePackage(s);
   t.not(p, s, 'creates a new object');
   t.not(p.resources, s.resources, 'creates a new resources array');
   t.is(p.path, './fixtures/dpm/datapackage.json', 'adds path');
@@ -48,7 +46,7 @@ test('normalize dpm generated datapackage', async t => {
 test('normalize gdp datapackage', async t => {
   const s = await loader('./fixtures/gdp/datapackage.json');
 
-  const p = normalize.datapackage(s);
+  const p = normalizePackage(s);
   t.not(s, p, 'creates a new object');
   t.not(p.resources, s.resources, 'creates a new resources array');
   t.is(p.path, './fixtures/gdp/datapackage.json', 'adds path');

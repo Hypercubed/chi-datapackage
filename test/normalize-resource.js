@@ -1,14 +1,12 @@
 import test from 'ava';
 
-import {Normalizer} from '../';
+import {normalizePackage} from '../';
 import loader from '../src/loader';
-
-const normalize = new Normalizer();
 
 test('normalize simple datapackage', async t => {
   const s = await loader('./fixtures/simple/datapackage.json');
 
-  const p = normalize.datapackage(s);
+  const p = normalizePackage(s);
   t.deepEqual(p.resources[0], {
     path: 'one.txt',
     format: 'txt',
@@ -28,7 +26,7 @@ test('normalize simple datapackage', async t => {
 test('normalize inline datapackage', async t => {
   const s = await loader('./fixtures/inline/datapackage.json');
 
-  const p = normalize.datapackage(s);
+  const p = normalizePackage(s);
   t.deepEqual(p.resources[0], {
     format: 'txt',
     data: 'hello',
@@ -44,7 +42,7 @@ test('normalize inline datapackage', async t => {
 test('normalize schema in resource', async t => {
   const s = await loader('./fixtures/schema/datapackage.json');
 
-  const p = normalize.datapackage(s);
+  const p = normalizePackage(s);
   t.is(p.resources[0].schema, p.schemas['xyz-schema']);
   t.deepEqual(p.resources[0], {
     path: 'one.csv',
@@ -62,7 +60,7 @@ test('normalize schema in resource', async t => {
 test('normalize gdp datapackage', async t => {
   const s = await loader('./fixtures/gdp/datapackage.json');
 
-  const p = normalize.datapackage(s);
+  const p = normalizePackage(s);
   t.deepEqual(p.resources[0], {
     name: 'gdp',
     path: 'data/gdp.csv',

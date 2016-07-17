@@ -2,10 +2,13 @@
 
 _\( managed using [todo-md](https://github.com/Hypercubed/todo-md) \)_
 
-- [ ] Normalizer
+- [x] Normalizer
   - [ ] Normalize schemas
   - [ ] Handle URL schemas
   - [ ] Test datapackage loaded from url
-- [ ] Resource processors
-- [ ] Schema processor
+- [x] Resource processors
+  - [ ] test each processor
+- [x] Schema processor
+  - [ ] Test each cast
+  - [ ] Support type formats
 - [ ] Loader?

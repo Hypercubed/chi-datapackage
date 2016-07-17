@@ -1,14 +1,12 @@
 import test from 'ava';
 
-import {Normalizer} from '../';
+import {normalizePackage} from '../';
 import loader from '../src/loader';
-
-const normalize = new Normalizer();
 
 test('normalize simple datapackage', async t => {
   const s = await loader('./fixtures/simple/datapackage.json');
 
-  const p = normalize.datapackage(s);
+  const p = normalizePackage(s);
   t.deepEqual(p.$resourcesByName['one.txt'], {
     path: 'one.txt',
     format: 'txt',
@@ -28,7 +26,7 @@ test('normalize simple datapackage', async t => {
 test('normalize gdp datapackage', async t => {
   const s = await loader('./fixtures/gdp/datapackage.json');
 
-  const p = normalize.datapackage(s);
+  const p = normalizePackage(s);
   t.deepEqual(p.$resourcesByName.gdp, {
     name: 'gdp',
     path: 'data/gdp.csv',

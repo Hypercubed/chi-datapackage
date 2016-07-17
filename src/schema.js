@@ -61,24 +61,20 @@ function generateCastMap (schema) {
 
 function processSchema ({data, schema}) {
   if (!Array.isArray(data)) {
-    return data;
+    return {data};
   }
 
-  if (!schema.castMap) {
-    // calculate and store cast map
-    schema.castMap = generateCastMap(schema);
+  if (!schema.$castMap) {
+    // calculate and store cast map, warning, side effects
+    schema.$castMap = generateCastMap(schema);
   }
 
-  const castMap = schema.castMap;
+  const castMap = schema.$castMap;
 
   data = data.map(d => {
     const r = {};
-    for (const key in d) {
-      if (key in castMap) {
-        r[key] = castMap[key](d[key]);
-      } else {
-        r[key] = d[key];
-      }
+    for (const key in d) { /* eslint guard-for-in: 0 */
+      r[key] = (key in castMap) ? castMap[key](d[key]) : d[key];
     }
     return r;
   });

@@ -4,12 +4,11 @@ const urijs = require('urijs');
 const deepExtend = require('deep-extend');
 
 const MimeLookup = require('mime-lookup');
-const mimeTypes = require('./mime.json');
 
 class Normalizer {
   constructor (opts) {
     opts = opts || {};
-    this.mime = new MimeLookup(opts.mimeDb || mimeTypes);
+    this.mime = new MimeLookup(opts.mimeDb || {});
   }
 
   datapackage (datapackage) {
@@ -46,7 +45,7 @@ class Normalizer {
       }
     }
 
-    this.index(normalized);
+    index(normalized);
 
     return normalized;
   }
@@ -75,16 +74,18 @@ class Normalizer {
 
     return resource;
   }
-
-  index (datapackage) {
-    datapackage.$resourcesByName = {};
-    datapackage.resources.forEach(r => {
-      if (r.name) {
-        datapackage.$resourcesByName[r.name] = r;
-      }
-    });
-    return datapackage;
-  }
 }
 
-module.exports = Normalizer;
+function index (datapackage) {
+  datapackage.$resourcesByName = {};
+  datapackage.resources.forEach(r => {
+    if (r.name) {
+      datapackage.$resourcesByName[r.name] = r;
+    }
+  });
+  return datapackage;
+}
+
+module.exports = {
+  Normalizer
+};
