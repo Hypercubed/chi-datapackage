@@ -1,6 +1,6 @@
 {
   "name": "chi-datapackage",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Normalize datapackage and datapackage resources",
   "main": "index.js",
   "files": [
