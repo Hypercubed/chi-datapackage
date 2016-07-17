@@ -8,42 +8,31 @@ const jsonParse = require('./json');
 const typeToCast = {
   string: {
     default: String
-    /* uri:
-    email:
-    binary: */
+    /* todo: format, uri, email, binary: */
   },
   integer: {
     default: parseInt
   },
   number: {
     default: parseFloat
-    // currency: parseFloat
+    // todo: format, example currency
   },
   date: {
     any: d => new Date(d),
     default: d => new Date(d)
-    // fmt:
-  },
-  time: {
-    any: d => new Date(d),
-    default: d => new Date(d)
-    // fmt:
-  },
-  datetime: {
-    any: d => new Date(d),
-    default: d => new Date(d)
-    // fmt:
+    // todo: format, example "yyyy"
   },
   boolean: {
     default: Boolean
   },
   object: {
     default: jsonParse
-  },
-  array: {
-    default: jsonParse
   }
 };
+
+typeToCast.array = typeToCast.object;
+typeToCast.time = typeToCast.date;
+typeToCast.datetime = typeToCast.date;
 
 function generateCastMap (schema) {
   const castMap = {};
@@ -64,12 +53,7 @@ function processSchema ({data, schema}) {
     return {data};
   }
 
-  if (!schema.$castMap) {
-    // calculate and store cast map, warning, side effects
-    schema.$castMap = generateCastMap(schema);
-  }
-
-  const castMap = schema.$castMap;
+  const castMap = schema.$castMap || (schema.$castMap = generateCastMap(schema));
 
   data = data.map(d => {
     const r = {};
