@@ -5,7 +5,7 @@ import loader from '../src/loader';
 
 const normalize = new Normalizer();
 
-test('process bare datapackage', async t => {
+test('normalize bare datapackage', async t => {
   const s = await loader('./fixtures/bare/datapackage.json');
 
   const p = normalize.datapackage(s);
@@ -19,7 +19,7 @@ test('process bare datapackage', async t => {
   t.deepEqual(p.resources, [], 'adds resources array'); // MAY
 });
 
-test('process simple datapackage', async t => {
+test('normalize simple datapackage', async t => {
   const s = await loader('./fixtures/simple/datapackage.json');
 
   const p = normalize.datapackage(s);
@@ -35,7 +35,7 @@ test('process simple datapackage', async t => {
   t.deepEqual(p.resources.map(d => typeof d), ['object', 'object'], 'converts resources to objects');
 });
 
-test('process dpm generated datapackage', async t => {
+test('normalize dpm generated datapackage', async t => {
   const s = await loader('./fixtures/dpm/datapackage.json');
 
   const p = normalize.datapackage(s);
@@ -45,7 +45,7 @@ test('process dpm generated datapackage', async t => {
   t.is(p.base, 'fixtures/dpm/', 'adds base');
 });
 
-test('process gdp datapackage', async t => {
+test('normalize gdp datapackage', async t => {
   const s = await loader('./fixtures/gdp/datapackage.json');
 
   const p = normalize.datapackage(s);

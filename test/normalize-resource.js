@@ -5,7 +5,7 @@ import loader from '../src/loader';
 
 const normalize = new Normalizer();
 
-test('process simple datapackage', async t => {
+test('normalize simple datapackage', async t => {
   const s = await loader('./fixtures/simple/datapackage.json');
 
   const p = normalize.datapackage(s);
@@ -25,7 +25,7 @@ test('process simple datapackage', async t => {
   });
 });
 
-test('process inline datapackage', async t => {
+test('normalize inline datapackage', async t => {
   const s = await loader('./fixtures/inline/datapackage.json');
 
   const p = normalize.datapackage(s);
@@ -36,12 +36,12 @@ test('process inline datapackage', async t => {
   });
   t.deepEqual(p.resources[1], {
     format: 'csv',
-    data: 'A,B,C\n1,2,3\n4,5,6',
+    data: [{A: '1', B: '2', C: '3'}, {A: '4', B: '5', C: '6'}],
     mediatype: 'text/csv'
   });
 });
 
-test('process schema in resource', async t => {
+test('normalize schema in resource', async t => {
   const s = await loader('./fixtures/schema/datapackage.json');
 
   const p = normalize.datapackage(s);
@@ -59,7 +59,7 @@ test('process schema in resource', async t => {
   });
 });
 
-test('process gdp datapackage', async t => {
+test('normalize gdp datapackage', async t => {
   const s = await loader('./fixtures/gdp/datapackage.json');
 
   const p = normalize.datapackage(s);

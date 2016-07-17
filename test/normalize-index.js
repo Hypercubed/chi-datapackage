@@ -5,7 +5,7 @@ import loader from '../src/loader';
 
 const normalize = new Normalizer();
 
-test('process simple datapackage', async t => {
+test('normalize simple datapackage', async t => {
   const s = await loader('./fixtures/simple/datapackage.json');
 
   const p = normalize.datapackage(s);
@@ -25,7 +25,7 @@ test('process simple datapackage', async t => {
   });
 });
 
-test('process gdp datapackage', async t => {
+test('normalize gdp datapackage', async t => {
   const s = await loader('./fixtures/gdp/datapackage.json');
 
   const p = normalize.datapackage(s);
