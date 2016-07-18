@@ -22,5 +22,9 @@
     "charset": "UTF-8",
     "compressible": true,
     "extensions": ["json", "map"]
+  },
+  "text/matrix": {
+    "source": "custom",
+    "extensions": ["matrix", "expression", "osc"]
   }
 }

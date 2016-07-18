@@ -7,12 +7,15 @@
     "src"
   ],
   "scripts": {
-    "test": "xo && ava"
+    "test": "xo && ava",
+    "coverage": "nyc --reporter=lcov --reporter=text ava"
   },
   "author": "J. Harshbarger",
   "license": "MIT",
   "devDependencies": {
     "ava": "^0.15.2",
+    "eslint-plugin-node": "^2.0.0",
+    "nyc": "^7.0.0",
     "xo": "^0.16.0"
   },
   "xo": {
@@ -22,7 +25,16 @@
       "node",
       "browser"
     ],
+    "plugins": [
+      "node"
+    ],
     "rules": {
+      "node/no-unsupported-features": [
+        2,
+        {
+          "version": 4
+        }
+      ],
       "import/no-extraneous-dependencies": 0,
       "space-before-function-paren": [
         2,
@@ -40,7 +52,15 @@
           ]
         }
       ]
-    }
+    },
+    "overrides": [
+      {
+        "files": "test/*.js",
+        "rules": {
+          "node/no-unsupported-features": 0
+        }
+      }
+    ]
   },
   "dependencies": {
     "babyparse": "^0.4.6",

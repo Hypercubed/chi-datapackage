@@ -1,3 +1,4 @@
+/* eslint node/no-unsupported-features: 0 */
 import test from 'ava';
 
 import {normalizePackage} from '../';
@@ -30,22 +31,7 @@ test('normalize gdp datapackage', async t => {
   t.deepEqual(p.$resourcesByName.gdp, {
     name: 'gdp',
     path: 'data/gdp.csv',
-    schema: {
-      fields: [
-        {name: 'Country Name', type: 'string'},
-        {
-          name: 'Country Code',
-          type: 'string',
-          foreignkey: 'iso-3-geo-codes/id'
-        },
-        {name: 'Year', type: 'date', format: 'yyyy'},
-        {
-          name: 'Value',
-          description: 'GDP in current USD',
-          type: 'number'
-        }
-      ]
-    },
+    schema: s.resources[0].schema,
     format: 'csv',
     url: 'fixtures/gdp/data/gdp.csv',
     mediatype: 'text/csv'

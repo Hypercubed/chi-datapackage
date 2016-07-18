@@ -1,0 +1,70 @@
+{
+  "name": "content",
+  "resources": [
+    {
+      "format": "txt",
+      "data": "hello"
+    },
+    {
+      "data": [{"A": "1", "B": "2", "C": "3"}, {"A": "4", "B": "5", "C": "6"}]
+    },
+    {
+      "format": "matrix",
+      "content": "A\tB\tC\n1\t2\t3\n4\t5\t6"
+    },
+    {
+      "format": "matrix",
+      "dialect": {
+        "delimiter": ","
+      },
+      "content": "A,B,C\n1,2,3\n4,5,6"
+    },
+    {
+      "format": "csv",
+      "content": "A,B,C\n1,2,3\n4,5,6",
+      "schema": {
+        "fields": [
+          {"name": "A", "type": "string"},
+          {"name": "B", "type": "number"},
+          {"name": "C", "type": "number"}
+        ]
+      }
+    },
+    {
+      "format": "csv",
+      "content": "A,B,C\n1,2,3\n4,5,6",
+      "schema": "abc-schema"
+    },
+    {
+      "format": "tsv",
+      "content": "A\tB\tC\n1\t2\t3\n4\t5\t6",
+      "schema": "abc-schema"
+    },
+    {
+      "format": "json",
+      "content": "[{\"A\": \"1\",\"B\": \"2\",\"C\": \"3\"},{\"A\": \"4\",\"B\": \"5\",\"C\": \"6\"}]",
+      "schema": "abc-schema"
+    },
+    {
+      "format": "json",
+      "data": [{"A": "1", "B": "2", "C": "3"}, {"A": "4", "B": "5", "C": "6"}],
+      "schema": "abc-schema"
+    },
+    {
+      "format": "yaml",
+      "content": "  - \n    A: \"1\"\n    B: \"2\"\n    C: \"3\"\n  - \n    A: \"4\"\n    B: \"5\"\n    C: \"6\"\n",
+      "schema": "abc-schema"
+    }
+  ],
+  "schemas": {
+    "abc-schema": {
+      "fields": [
+        {"name": "A", "type": "string"},
+        {"name": "B", "type": "number"},
+        {"name": "C", "type": "number"}
+      ]
+    }
+  },
+  "readme": "readme.md",
+  "image": "image.png"
+}

@@ -1,4 +1,5 @@
 const readFile = require('fs').readFile;
+const parse = require('json5').parse;
 
 function readPackage (path, enc) {
   return new Promise((resolve, reject) => {
@@ -6,7 +7,7 @@ function readPackage (path, enc) {
       if (err) {
         return reject(err);
       }
-      resolve(Object.assign(JSON.parse(res), {path}));
+      resolve(Object.assign(parse(res), {path}));
     });
   });
 }

@@ -1,3 +1,5 @@
+const MimeLookup = require('mime-lookup');
+
 const Normalizer = require('./src/normalizer');
 const Processor = require('./src/processor.js');
 const SchemaProcessor = require('./src/schema');
@@ -6,7 +8,8 @@ const mimeDb = require('./src/mime.json');
 const translators = require('./src/translators');
 const types = require('./src/types');
 
-const normalize = new Normalizer({mimeDb});
+const mimeLookup = new MimeLookup(mimeDb);
+const normalize = new Normalizer({mimeLookup});
 const schemaProcessor = new SchemaProcessor({types});
 const processor = new Processor({translators, schemaProcessor});
 

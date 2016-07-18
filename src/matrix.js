@@ -1,13 +1,13 @@
 const Papa = require('babyparse');
 
-function matrixParse (content, opts) {
-  opts = Object.assign({
+function matrixParse (content, dialect) {
+  dialect = Object.assign({
     delimiter: '\t',
     fastMode: false,
     skipEmptyLines: true,
     comments: '#'
-  }, opts);
-  const parsed = Papa.parse(content, opts);
+  }, dialect);
+  const parsed = Papa.parse(content, dialect);
   parsed.data = convertToPlainMatrix(parsed.data);
   return parsed;
 }
@@ -16,33 +16,11 @@ function convertToPlainMatrix (table) {
   table = table.slice();
   const columns = table.splice(0, 1)[0].slice(1);
   const rows = table.map(d => d.splice(0, 1)[0]);
-  return deepFreeze({
+  return {
     columns,
     rows,
     table
-  });
+  };
 }
 
-// To make obj fully immutable, freeze each object in obj.
-// To do so, we use this function.
-function deepFreeze (obj) {
-  // Retrieve the property names defined on obj
-  const propNames = Object.getOwnPropertyNames(obj);
-
-  // Freeze properties before freezing self
-  propNames.forEach(name => {
-    const prop = obj[name];
-
-    // Freeze prop if it is an object
-    if (typeof prop === 'object' && prop !== null) {
-      deepFreeze(prop);
-    }
-  });
-
-  // Freeze self (no-op if already frozen)
-  return Object.freeze(obj);
-}
-
-module.export = {
-  matrixParse
-};
+module.exports = matrixParse;

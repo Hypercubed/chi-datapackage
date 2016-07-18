@@ -3,12 +3,10 @@
 const urijs = require('urijs');
 const deepExtend = require('deep-extend');
 
-const MimeLookup = require('mime-lookup');
-
 class Normalizer {
   constructor (opts) {
     opts = opts || {};
-    this.mime = new MimeLookup(opts.mimeDb || {});
+    this.mime = opts.mimeLookup;
   }
 
   datapackage (datapackage) {
@@ -62,6 +60,10 @@ class Normalizer {
       resource.name = resource.name || uri.filename();
 
       resource.url = resource.url || uri.absoluteTo(datapackage.base).href();
+    }
+
+    if (!resource.format && !resource.content && resource.data) {
+      resource.format = 'json';
     }
 
     if (resource.format) {

@@ -1,3 +1,4 @@
+/* eslint node/no-unsupported-features: 0 */
 import test from 'ava';
 
 import {normalizePackage} from '../';
