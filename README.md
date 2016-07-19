@@ -11,21 +11,46 @@
 npm i -D chi-datapackage
 ```
 
-## Usage
+## Basic usage
 
 ```js
-import {readFileSync} from 'fs';
-import {Normalizer} from 'chi-datapackage';
+import {load} from 'chi-datapackage';
 
-const normalize = new Normalizer();
-
-const path = './some/file/path';
-const content = readFileSync(filename, 'utf8');
-
-const datapackage = normalize.datapackage({
-  ...JSON.parse(content),
-  path
+load('//datapackage/path/or/url').then(datapackage => {
+  /* so something */
 });
+```
+
+## Advanced usage
+
+```js
+const MimeLookup = require('mime-lookup');
+
+const Normalizer = require('chi-datapackagesrc/normalizer');
+const Processor = require('chi-datapackage/src/processor.js');
+const SchemaProcessor = require('chi-datapackage/src/schema');
+const Loader = require('chi-datapackage/src/loader');
+
+const mimeDb = require('chi-datapackage/src/lib/mime.json');         // or your custom mimeDb
+const translators = require('chi-datapackage/src/lib/translators');  // or your custom translators
+const types = require('chi-datapackage/src/lib/types');              // or your custom types
+const fetch = require('chi-datapackage/src/lib/fetch');              // or your custom fetch promise
+
+const mimeLookup = new MimeLookup(mimeDb);
+const normalize = new Normalizer({mimeLookup});
+const schemaProcessor = new SchemaProcessor({types});
+const process = new Processor({translators, schemaProcessor});
+const load = new Loader({fetch});
+
+load
+  .datapackage('//datapackage/path/or/url')
+  .then(datapackage => normalize.datapackage(p))
+  .then(datapackage => normalize.resources(p))
+  .then(datapackage => load.resources(p))
+  .then(datapackage => process.datapackage(p))
+  .then(datapackage => {
+    /* so something */
+  });
 ```
 
 ## License
