@@ -1,0 +1,68 @@
+{
+  "name": "simple",
+  "resources": [
+    "one.txt",
+    "two.csv",
+    "three.tsv",
+    {
+      "name": "four",
+      "format": "matrix",
+      "path": "three.tsv"
+    },
+    {
+      "name": "five",
+      "format": "matrix",
+      "dialect": {
+        "delimiter": ","
+      },
+      "path": "two.csv"
+    },
+    {
+      "name": "six",
+      "path": "two.csv",
+      "schema": {
+        "fields": [
+          {"name": "A", "type": "string"},
+          {"name": "B", "type": "number"},
+          {"name": "C", "type": "number"}
+        ]
+      }
+    },
+    {
+      "name": "seven",
+      "path": "two.csv",
+      "schema": "abc-schema"
+    },
+    {
+      "name": "eight",
+      "path": "three.tsv",
+      "schema": "abc-schema"
+    },
+    {
+      "name": "nine",
+      "path": "json.json",
+      "schema": "abc-schema"
+    },
+    {
+      "name": "ten",
+      "path": "json.json5",
+      "schema": "abc-schema"
+    },
+    {
+      "name": "eleven",
+      "path": "yaml.yml",
+      "schema": "abc-schema"
+    }
+  ],
+  "schemas": {
+    "abc-schema": {
+      "fields": [
+        {"name": "A", "type": "string"},
+        {"name": "B", "type": "number"},
+        {"name": "C", "type": "number"}
+      ]
+    }
+  },
+  "readme": "readme.md",
+  "image": "image.png"
+}

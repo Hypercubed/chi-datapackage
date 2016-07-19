@@ -10,10 +10,10 @@ class Normalizer {
   }
 
   datapackage (datapackage) {
-    const path = datapackage.path;
+    const path = datapackage.url || datapackage.path;
     const uri = urijs(path);
     const dir = uri.normalizePathname().directory();
-    const base = `${datapackage.base || dir}/`;
+    const base = datapackage.url;
 
     const normalized = deepExtend({
       path,
@@ -30,10 +30,6 @@ class Normalizer {
       }
     });
 
-    if (normalized.resources) {
-      normalized.resources = normalized.resources.map(resource => this.resource(normalized, resource));
-    }
-
     if (normalized.schemas) {
       const schemas = normalized.schemas;
       for (const key in schemas) {
@@ -43,9 +39,15 @@ class Normalizer {
       }
     }
 
-    index(normalized);
-
     return normalized;
+  }
+
+  resources (datapackage) {
+    if (datapackage.resources) {
+      datapackage.resources = datapackage.resources.map(resource => this.resource(datapackage, resource));
+    }
+    index(datapackage);
+    return datapackage;
   }
 
   resource (datapackage, resource) {

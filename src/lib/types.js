@@ -14,7 +14,6 @@ const typeToCast = {
     // todo: format, example currency
   },
   date: {
-    any: d => new Date(d),
     default: d => new Date(d)
     // todo: format, example "yyyy"
   },
@@ -29,5 +28,6 @@ const typeToCast = {
 typeToCast.array = typeToCast.object;
 typeToCast.time = typeToCast.date;
 typeToCast.datetime = typeToCast.date;
+typeToCast.date.any = typeToCast.date.default;
 
 module.exports = typeToCast;

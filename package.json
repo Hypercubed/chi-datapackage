@@ -65,7 +65,10 @@
   "dependencies": {
     "babyparse": "^0.4.6",
     "crlf-helper": "^0.1.0",
+    "datapackage-identifier": "^0.4.1",
+    "debug": "^2.2.0",
     "deep-extend": "^0.4.1",
+    "isomorphic-fetch": "^2.2.1",
     "js-yaml": "^3.6.1",
     "json5": "^0.5.0",
     "mime-lookup": "0.0.2",

@@ -1,55 +1,63 @@
 /* eslint node/no-unsupported-features: 0 */
 import test from 'ava';
 
-import {normalizePackage} from '../';
-import loader from '../src/loader';
+import {normalizePackage, normalizeResources, loadPackage} from '../';
 
 test('normalize bare datapackage', async t => {
-  const s = await loader('./fixtures/bare/datapackage.json');
+  const s = await loadPackage('fixtures/bare/');
 
-  const p = normalizePackage(s);
+  const p = normalizeResources(normalizePackage(s));
   t.not(p, s, 'creates a new object');
   t.not(p.resources, s.resources, 'creates a new resources array');
-  t.is(p.path, './fixtures/bare/datapackage.json', 'adds path');
-  t.is(p.base, 'fixtures/bare/', 'adds base');
-  t.is(p.homepage, 'fixtures/bare/', 'adds homepage');  // MAY
-  t.is(p.name, 'fixtures/bare', 'adds name');  // MUST
+  t.regex(p.path, /fixtures\/bare\/$/, 'adds path');
+  t.regex(p.base, /fixtures\/bare\/$/, 'adds base');
+  t.is(p.name, 'bare', 'adds name');  // MUST
   t.is(p.description, '', 'adds description');  // MAY
   t.deepEqual(p.resources, [], 'adds resources array'); // MAY
 });
 
 test('normalize simple datapackage', async t => {
-  const s = await loader('./fixtures/simple/datapackage.json');
+  const s = await loadPackage('fixtures/inline/');
 
-  const p = normalizePackage(s);
+  const p = normalizeResources(normalizePackage(s));
   t.not(p, s, 'creates a new object');
   t.not(p.resources, s.resources, 'creates a new resources array');
-  t.is(p.path, './fixtures/simple/datapackage.json', 'adds path');
-  t.is(p.base, 'fixtures/simple/', 'adds base');
-  t.is(p.homepage, 'fixtures/simple/', 'adds homepage');  // MAY
-  t.is(p.image, 'fixtures/simple/image.png', 'normalizes image path');
-  t.is(p.readme, 'fixtures/simple/readme.md', 'normalizes image path');
+  t.regex(p.path, /fixtures\/inline\/$/, 'adds path');
+  t.regex(p.base, /fixtures\/inline\/$/, 'adds base');
+  t.regex(p.image, /fixtures\/inline\/image.png$/, 'normalizes image path');
+  t.regex(p.readme, /fixtures\/inline\/readme.md$/, 'normalizes image path');
   t.is(p.description, '', 'adds description');  // MAY
-  t.is(p.resources.length, 2, 'adds resources array');
-  t.deepEqual(p.resources.map(d => typeof d), ['object', 'object'], 'converts resources to objects');
+  p.resources.forEach(d => {
+    t.is(typeof d, 'object');
+  });
 });
 
 test('normalize dpm generated datapackage', async t => {
-  const s = await loader('./fixtures/dpm/datapackage.json');
+  const s = await loadPackage('fixtures/dpm/');
 
-  const p = normalizePackage(s);
+  const p = normalizeResources(normalizePackage(s));
   t.not(p, s, 'creates a new object');
   t.not(p.resources, s.resources, 'creates a new resources array');
-  t.is(p.path, './fixtures/dpm/datapackage.json', 'adds path');
-  t.is(p.base, 'fixtures/dpm/', 'adds base');
+  t.regex(p.path, /fixtures\/dpm\/$/, 'adds path');
+  t.regex(p.base, /fixtures\/dpm\/$/, 'adds base');
 });
 
 test('normalize gdp datapackage', async t => {
-  const s = await loader('./fixtures/gdp/datapackage.json');
+  const s = await loadPackage('fixtures/gdp/');
 
-  const p = normalizePackage(s);
+  const p = normalizeResources(normalizePackage(s));
   t.not(s, p, 'creates a new object');
   t.not(p.resources, s.resources, 'creates a new resources array');
-  t.is(p.path, './fixtures/gdp/datapackage.json', 'adds path');
-  t.is(p.base, 'fixtures/gdp/', 'adds base');
+  t.regex(p.path, /fixtures\/gdp\/$/, 'adds path');
+  t.regex(p.base, /fixtures\/gdp\/$/, 'adds base');
+});
+
+test('normalize gdp datapackage - from url', async t => {
+  const s = await loadPackage('http://github.com/datasets/gdp');
+
+  const p = normalizeResources(normalizePackage(s));
+  t.not(s, p, 'creates a new object');
+  t.not(p.resources, s.resources, 'creates a new resources array');
+  t.is(p.url, 'http://raw.githubusercontent.com/datasets/gdp/master/', 'adds path');
+  t.is(p.base, 'http://raw.githubusercontent.com/datasets/gdp/master/', 'adds base');
 });

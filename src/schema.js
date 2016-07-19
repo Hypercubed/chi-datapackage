@@ -27,6 +27,7 @@ class Schema {
 
   process (resource) {
     let data = resource.data;
+    /* istanbul ignore if */
     if (!Array.isArray(data)) {
       return {data};
     }

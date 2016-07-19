@@ -34,13 +34,5 @@ module.exports = {
 
   'text/matrix': resource => matrixParse(resource.content, resource.dialect),
 
-  'application/json': resource => {
-    const data = jsonParse(resource.content);
-    let path = resource.path;
-    if (data.url && data.url.indexOf('api.github.com') > -1) {  // move
-      data.name = `${data.owner.login}/${data.id}`;
-      path = `gists/${data.id}`;
-    }
-    return {data, path};
-  }
+  'application/json': resource => ({data: jsonParse(resource.content)})
 };

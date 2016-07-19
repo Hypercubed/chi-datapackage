@@ -12,11 +12,10 @@ class Processor {
   datapackage (dataPackage) {
     // todo: process schemas?
     const resources = dataPackage.resources.map(resource => this.resource(resource));
-    return Object.assign({}, dataPackage, {resources});
+    return Object.assign(dataPackage, {resources});
   }
 
   resource (resource) {
-    resource = Object.assign({}, resource);
     if (resource.content) {
       const translator = this.translators[resource.mediatype];
       if (translator) {

@@ -21,7 +21,7 @@
     "source": "iana",
     "charset": "UTF-8",
     "compressible": true,
-    "extensions": ["json", "map"]
+    "extensions": ["json", "json5", "map"]
   },
   "text/matrix": {
     "source": "custom",

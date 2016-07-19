@@ -1,8 +1,7 @@
 {
   "name": "simple",
   "resources": [
-    "one.txt",
-    "two.tsv"
+    "one.txt"
   ],
   "readme": "readme.md",
   "image": "image.png"
