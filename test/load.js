@@ -1,6 +1,4 @@
 /* eslint node/no-unsupported-features: 0 */
-import path from 'path';
-
 import test from 'ava';
 
 import {load} from '../';

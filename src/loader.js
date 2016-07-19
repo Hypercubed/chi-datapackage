@@ -1,3 +1,5 @@
+'use strict';
+
 const path = require('path');
 const debug = require('debug')('Loader');
 const parse = require('json5').parse;
