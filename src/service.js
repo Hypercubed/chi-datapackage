@@ -53,9 +53,4 @@ class DataPackageService {
   }
 }
 
-DataPackageService.Normalizer = Normalizer;
-DataPackageService.Processor = Processor;
-DataPackageService.SchemaProcessor = SchemaProcessor;
-DataPackageService.Loader = Loader;
-
 module.exports = DataPackageService;

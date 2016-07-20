@@ -10,10 +10,10 @@ class Normalizer {
   }
 
   datapackage (datapackage) {
-    const path = datapackage.url || datapackage.path;
+    const path = datapackage.path || datapackage.url;
     const uri = urijs(path);
     const dir = uri.normalizePathname().directory();
-    const base = datapackage.url;
+    const base = path;
 
     const normalized = deepExtend({
       path,
@@ -61,7 +61,7 @@ class Normalizer {
       resource.format = resource.format || uri.suffix();
       resource.name = resource.name || uri.filename();
 
-      resource.url = resource.url || uri.absoluteTo(datapackage.base).href();
+      resource.url = resource.url || uri.absoluteTo(datapackage.url).href();
     }
 
     if (!resource.format && !resource.content && resource.data) {
