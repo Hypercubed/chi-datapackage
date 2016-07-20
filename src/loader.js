@@ -1,25 +1,34 @@
 'use strict';
 
-const path = require('path');
 const debug = require('debug')('Loader');
 const parse = require('json5').parse;
 
 const identifier = require('datapackage-identifier');
 
+const absURLRegEx = /^([^\/]+:\/\/|\/)/;
+
+const resolvePath = (() => {
+  if (typeof document !== 'undefined') {
+    // in browser
+    return function resolve (url) {
+      const div = document.createElement('div');
+      div.innerHTML = '<a></a>';
+      div.firstChild.href = url; // Ensures that the href is properly escaped
+      div.innerHTML = div.innerHTML; // Run the current innerHTML back through the parser
+      return div.firstChild.href;
+    };
+  }
+  return require('path').resolve;
+})();
+
 function normalizeDataPackageUrl (datapackage) {
   if (typeof datapackage === 'string') {
-    let id = datapackage;
-    if (id[0] === '/' || (id.indexOf('http') === -1 && id[datapackage.length - 1] === '/')) {
-      id = path.resolve(id);
-    }
-    datapackage = identifier.parse(id);
-  } else if (!datapackage.dataPackageJsonUrl && datapackage.path) {
-    let id = path.resolve(datapackage.path);
-    id = identifier.parse(id);
-    datapackage = Object.assign(datapackage, id);
-  } else if (!datapackage.dataPackageJsonUrl && datapackage.url) {
-    const id = identifier.parse(datapackage.url);
-    datapackage = Object.assign(datapackage, id);
+    datapackage = {url: datapackage};
+  }
+  if (!datapackage.dataPackageJsonUrl) {
+    let url = datapackage.path || datapackage.url;
+    url = url.match(absURLRegEx) ? url : resolvePath(url);
+    datapackage = Object.assign(datapackage, identifier.parse(url));
   }
   return datapackage;
 }

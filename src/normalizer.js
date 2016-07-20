@@ -46,7 +46,7 @@ class Normalizer {
     if (datapackage.resources) {
       datapackage.resources = datapackage.resources.map(resource => this.resource(datapackage, resource));
     }
-    index(datapackage);
+    Normalizer.index(datapackage);
     return datapackage;
   }
 
@@ -80,7 +80,7 @@ class Normalizer {
   }
 }
 
-function index (datapackage) {
+Normalizer.index = function index (datapackage) {
   datapackage.$resourcesByName = {};
   datapackage.resources.forEach(r => {
     if (r.name) {
@@ -88,6 +88,6 @@ function index (datapackage) {
     }
   });
   return datapackage;
-}
+};
 
 module.exports = Normalizer;

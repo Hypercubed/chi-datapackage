@@ -1,14 +1,14 @@
 /* eslint node/no-unsupported-features: 0 */
 import test from 'ava';
 
-import {normalizeResources, normalizePackage, loadPackage} from '../';
+import dp from '../';
 
 const json = [{A: '1', B: '2', C: '3'}, {A: '4', B: '5', C: '6'}];
 
 test('normalize simple datapackage resources', async t => {
-  const s = await loadPackage('fixtures/loaded/');
+  const s = await dp.loadPackage('fixtures/loaded/');
 
-  const p = normalizeResources(normalizePackage(s));
+  const p = dp.normalizeResources(dp.normalizePackage(s));
 
   t.is(p.resources[0].path, 'one.txt');
   t.is(p.resources[0].format, 'txt');
@@ -24,9 +24,9 @@ test('normalize simple datapackage resources', async t => {
 });
 
 test('normalize datapackage resources', async t => {
-  const s = await loadPackage('fixtures/inline/');
+  const s = await dp.loadPackage('fixtures/inline/');
 
-  const p = normalizeResources(normalizePackage(s));
+  const p = dp.normalizeResources(dp.normalizePackage(s));
 
   t.is(p.resources[0].format, 'txt');
   t.is(p.resources[0].data, 'hello');
@@ -56,9 +56,9 @@ test('normalize datapackage resources', async t => {
 });
 
 test('normalize gdp datapackage resources', async t => {
-  const s = await loadPackage({path: 'fixtures/gdp/'});
+  const s = await dp.loadPackage({path: 'fixtures/gdp/'});
 
-  const p = normalizeResources(normalizePackage(s));
+  const p = dp.normalizeResources(dp.normalizePackage(s));
 
   t.is(p.resources[0].name, 'gdp');
   t.is(p.resources[0].path, 'data/gdp.csv');
@@ -68,9 +68,9 @@ test('normalize gdp datapackage resources', async t => {
 });
 
 test('normalize gdp datapackage resources - from url', async t => {
-  const s = await loadPackage('http://github.com/datasets/gdp');
+  const s = await dp.loadPackage('http://github.com/datasets/gdp');
 
-  const p = normalizeResources(normalizePackage(s));
+  const p = dp.normalizeResources(dp.normalizePackage(s));
 
   t.is(p.resources[0].name, 'gdp');
   t.is(p.resources[0].path, 'data/gdp.csv');

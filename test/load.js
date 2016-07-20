@@ -1,7 +1,7 @@
 /* eslint node/no-unsupported-features: 0 */
 import test from 'ava';
 
-import {load} from '../';
+import dp from '../';
 
 const json = [{A: '1', B: '2', C: '3'}, {A: '4', B: '5', C: '6'}];
 const jsonProcessed = [{A: '1', B: 2, C: 3}, {A: '4', B: 5, C: 6}];
@@ -13,7 +13,7 @@ const matrix = {
 };
 
 test('process inline-content', async t => {
-  const p = await load('fixtures/inline/');
+  const p = await dp.load('fixtures/inline/');
 
   t.deepEqual(p.resources[0].data, 'hello');
   t.deepEqual(p.resources[1].data, json);
@@ -27,7 +27,7 @@ test('process inline-content', async t => {
 });
 
 test('process loaded-content', async t => {
-  const p = await load('fixtures/loaded/');
+  const p = await dp.load('fixtures/loaded/');
 
   t.deepEqual(p.resources[0].data, 'hello\n');
   t.deepEqual(p.resources[1].data, json);
@@ -42,7 +42,7 @@ test('process loaded-content', async t => {
 });
 
 test('load from data object', async t => {
-  const p = await load('fixtures/inline/');
+  const p = await dp.load('fixtures/inline/');
 
   t.deepEqual(p.resources[0].data, 'hello');
   t.deepEqual(p.resources[1].data, json);
@@ -56,7 +56,7 @@ test('load from data object', async t => {
 });
 
 test('process gold-prices', async t => {
-  const p = await load('fixtures/gdp/');
+  const p = await dp.load('fixtures/gdp/');
 
   t.is(p.resources[0].data.length, 10379);
   t.deepEqual(p.resources[0].data[0], {
@@ -68,7 +68,7 @@ test('process gold-prices', async t => {
 });
 
 test('process gold-prices - from url', async t => {
-  const p = await load('http://github.com/datasets/gdp');
+  const p = await dp.load('http://github.com/datasets/gdp');
 
   t.is(p.resources[0].data.length, 10379);
   t.deepEqual(p.resources[0].data[0], {
@@ -80,7 +80,7 @@ test('process gold-prices - from url', async t => {
 });
 
 test('process gold-prices - from url object', async t => {
-  const p = await load({url: 'http://github.com/datasets/gdp'});
+  const p = await dp.load({url: 'http://github.com/datasets/gdp'});
 
   t.is(p.resources[0].data.length, 10379);
   t.deepEqual(p.resources[0].data[0], {
