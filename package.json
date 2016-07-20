@@ -4,16 +4,20 @@
   "description": "Normalize datapackage and datapackage resources",
   "main": "index.js",
   "files": [
-    "src"
+    "src",
+    "dist"
   ],
   "scripts": {
     "test": "xo && ava",
-    "coverage": "nyc --reporter=lcov --reporter=text ava"
+    "build": "babel src -d dist && cp ./src/lib/mime.json ./dist/lib/",
+    "coverage": "nyc --reporter=lcov --reporter=text ava",
+    "prepublish": "npm run build"
   },
   "author": "J. Harshbarger",
   "license": "MIT",
   "devDependencies": {
     "ava": "^0.15.2",
+    "babel-preset-es2015": "^6.9.0",
     "eslint-plugin-node": "^2.0.0",
     "nyc": "^7.0.0",
     "xo": "^0.16.0"
