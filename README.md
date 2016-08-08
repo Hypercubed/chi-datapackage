@@ -26,8 +26,8 @@ load('//datapackage/path/or/url').then(datapackage => {
 ```js
 const MimeLookup = require('mime-lookup');
 
-const Normalizer = require('chi-datapackagesrc/normalizer');
-const Processor = require('chi-datapackage/src/processor.js');
+const Normalizer = require('chi-datapackage/src/normalizer');
+const Processor = require('chi-datapackage/src/processor');
 const SchemaProcessor = require('chi-datapackage/src/schema');
 const Loader = require('chi-datapackage/src/loader');
 
@@ -44,11 +44,11 @@ const load = new Loader({fetch});
 
 load
   .datapackage('//datapackage/path/or/url')
-  .then(datapackage => normalize.datapackage(p))
-  .then(datapackage => normalize.resources(p))
-  .then(datapackage => load.resources(p))
-  .then(datapackage => process.datapackage(p))
-  .then(datapackage => {
+  .then(p => normalize.datapackage(p))
+  .then(p => normalize.resources(p))
+  .then(p => load.resources(p))
+  .then(p => process.datapackage(p))
+  .then(p => {
     /* so something */
   });
 ```
