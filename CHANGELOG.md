@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* Fixed bug in DataPackageService:normalizeResource
+_(none)_
 
 --------------------
+
+## 2.1.1 (2016-08-09)
+* Fixed bug in DataPackageService:normalizeResource
 
 ## 2.1.0 (2016-08-09)
 * Added strict ISO 8601 UTC date and time types
