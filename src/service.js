@@ -26,8 +26,8 @@ class DataPackageService {
     return this.normalize.datapackage(p);
   }
 
-  normalizeResource (p) {
-    return this.normalize.resource(p);
+  normalizeResource (p, r) {
+    return this.normalize.resource(p, r);
   }
 
   normalizeResources (p) {

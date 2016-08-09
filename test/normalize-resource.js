@@ -55,26 +55,28 @@ test('normalize datapackage resources', async t => {
   }, 'with schema');
 });
 
-test('normalize gdp datapackage resources', async t => {
+test('normalize gdp datapackage resource', async t => {
   const s = await dp.loadPackage({path: 'fixtures/gdp/'});
 
-  const p = dp.normalizeResources(dp.normalizePackage(s));
+  const p = dp.normalizePackage(s);
+  const r = dp.normalizeResource(p, p.resources[0]);
 
-  t.is(p.resources[0].name, 'gdp');
-  t.is(p.resources[0].path, 'data/gdp.csv');
-  t.is(p.resources[0].format, 'csv');
-  t.regex(p.resources[0].url, /fixtures\/gdp\/data\/gdp.csv$/);
-  t.is(p.resources[0].mediatype, 'text/csv');
+  t.is(r.name, 'gdp');
+  t.is(r.path, 'data/gdp.csv');
+  t.is(r.format, 'csv');
+  t.regex(r.url, /fixtures\/gdp\/data\/gdp.csv$/);
+  t.is(r.mediatype, 'text/csv');
 });
 
 test('normalize gdp datapackage resources - from url', async t => {
   const s = await dp.loadPackage('http://github.com/datasets/gdp');
 
-  const p = dp.normalizeResources(dp.normalizePackage(s));
+  const p = dp.normalizePackage(s);
+  const r = dp.normalizeResource(p, p.resources[0]);
 
-  t.is(p.resources[0].name, 'gdp');
-  t.is(p.resources[0].path, 'data/gdp.csv');
-  t.is(p.resources[0].format, 'csv');
-  t.is(p.resources[0].url, 'http://raw.githubusercontent.com/datasets/gdp/master/data/gdp.csv');
-  t.is(p.resources[0].mediatype, 'text/csv');
+  t.is(r.name, 'gdp');
+  t.is(r.path, 'data/gdp.csv');
+  t.is(r.format, 'csv');
+  t.is(r.url, 'http://raw.githubusercontent.com/datasets/gdp/master/data/gdp.csv');
+  t.is(r.mediatype, 'text/csv');
 });
