@@ -33,7 +33,7 @@
           },
           {
             "name": "Value",
-            "description": "GDP in current USD", 
+            "description": "GDP in current USD",
             "type": "number"
           }
         ]

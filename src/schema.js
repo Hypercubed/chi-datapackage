@@ -16,13 +16,28 @@ class Schema {
   generate (schema) {
     const castMap = {};
     schema.fields.forEach(field => {
-      field.format = field.format || 'default';
-      if (field.type in this.types) {
-        const type = this.types[field.type];
-        castMap[field.name] = type[field.format] || type.default;
+      const fn = this.generateCastFn(field);
+      if (fn) {
+        castMap[field.name] = fn;
       }
     });
     return castMap;
+  }
+
+  generateCastFn (field) {
+    if (!field.type || !Object.prototype.hasOwnProperty.call(this.types, field.type)) {
+      return null;
+    }
+    const type = this.types[field.type];
+    let format = field.format || 'default';
+    let pattern = null;
+    if (format.indexOf(':') !== -1) {
+      const s = format.split(':');
+      format = s[0];
+      pattern = s[1];
+    }
+    const map = type[format] || type.default;
+    return pattern ? map(pattern) : map;
   }
 
   process (resource) {

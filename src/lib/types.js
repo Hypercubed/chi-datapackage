@@ -1,24 +1,43 @@
+const d3time = require('d3-time-format');
+const parseIsoDuration = require('parse-iso-duration');
 
 const jsonParse = require('./json');
+
+const TRUE_VALUES = ['yes', 'y', 'true', 't', '1'];
 
 const typeToCast = {
   string: {
     default: String
-    /* todo: format, uri, email, binary: */
+    /* todo: format, uri, email, binary? */
   },
   integer: {
     default: parseInt
   },
   number: {
     default: parseFloat
-    // todo: format, example currency
+    // todo: currency?
+  },
+  datetime: {
+    default: d3time.utcParse('%Y-%m-%dT%H:%M:%SZ'),
+    fmt: d3time.utcParse,
+    any: d => new Date(d)
   },
   date: {
-    default: d => new Date(d)
-    // todo: format, example "yyyy"
+    default: d3time.utcParse('%Y-%m-%d'),
+    fmt: d3time.utcParse,
+    yyyy: d3time.utcParse('%Y'),
+    any: d => new Date(d)
+  },
+  time: {
+    default: d3time.utcParse('%H:%M:%S'),
+    fmt: d3time.utcParse,
+    any: d => new Date(d)
+  },
+  duration: {
+    default: parseIsoDuration
   },
   boolean: {
-    default: Boolean
+    default: d => d === true || TRUE_VALUES.indexOf(String(d).toLowerCase()) !== -1
   },
   object: {
     default: jsonParse
@@ -26,8 +45,5 @@ const typeToCast = {
 };
 
 typeToCast.array = typeToCast.object;
-typeToCast.time = typeToCast.date;
-typeToCast.datetime = typeToCast.date;
-typeToCast.date.any = typeToCast.date.default;
 
 module.exports = typeToCast;
