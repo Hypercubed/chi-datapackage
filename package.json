@@ -8,10 +8,11 @@
     "dist"
   ],
   "scripts": {
-    "test": "xo && ava",
+    "check": "npm run flow && xo && ava",
+    "test": "ava",
     "build": "babel src -d dist && cp ./src/lib/mime.json ./dist/lib/",
     "coverage": "nyc --reporter=lcov --reporter=text ava",
-    "prepublish": "npm run build",
+    "prepublish": "npm run build && npm run check",
     "version": "chg release -y && git add -A CHANGELOG.md",
     "flow": "flow; test $? -eq 0 -o $? -eq 2"
   },
