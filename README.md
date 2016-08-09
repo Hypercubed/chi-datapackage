@@ -3,22 +3,44 @@
 [![NPM version][npm-image]][npm-url]
 [![Build Status][travis-image]][travis-url]
 
-> Normalize datapackage and datapackage resources
+> A utility library for working with [datapackage files](http://frictionlessdata.io/guides/data-package/) in Node and the browser.
+> Designed for use in [Project χ](https://github.com/Hypercubed/Project-Chi).
+
+## Features
+
+* DataPackage and resource loader (node and browser compatible).
+* DataPackage and resource normalizer.
+* Resource translators (tsv, csv, yaml, json, etc).
+* JSON Table Schema processor (include type casting).
+* Customizable loader, mime-types, translators, and data-types.
+
+## Goals
+
+* A set of utilities for working with DataPackages and JSON Table Schema.
+* Be a core component of [Project χ](https://github.com/Hypercubed/Project-Chi) but work independently.
+* Maximize compliance with the the DataPackages and JSON Table Schema specifications.
 
 ## Install
 
 ```sh
-npm i -D chi-datapackage
+npm install --save chi-datapackage
+```
+
+or
+
+```sh
+jspm npm:chi-datapackage
 ```
 
 ## Basic usage
 
 ```js
-import {load} from 'chi-datapackage';
+import dp from 'chi-datapackage';
 
-load('//datapackage/path/or/url').then(datapackage => {
-  /* so something */
-});
+dp.load('//datapackage/path/or/url')
+  .then(datapackage => {
+    /* so something */
+  });
 ```
 
 ## Advanced usage
