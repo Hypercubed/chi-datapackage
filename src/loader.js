@@ -1,4 +1,10 @@
+// @flow
+
 'use strict';
+
+/* ::
+import type {Resource, DataPackage} from "./types/datapackage";
+*/
 
 const debug = require('debug')('Loader');
 const parse = require('json5').parse;
@@ -12,36 +18,43 @@ const resolvePath = (() => {
     // in browser
     return function resolve (url) {
       const div = document.createElement('div');
-      div.innerHTML = '<a></a>';
-      div.firstChild.href = url; // Ensures that the href is properly escaped
+      const link = document.createElement('a');
+      div.appendChild(link);
+      link.href = url; // Ensures that the href is properly escaped
       div.innerHTML = div.innerHTML; // Run the current innerHTML back through the parser
-      return div.firstChild.href;
+      return link.href;
     };
   }
   return require('path').resolve;
 })();
 
-function normalizeDataPackageUrl (datapackage) {
+function normalizeDataPackageUrl (datapackage /* : string | DataPackage */) /* : DataPackage */ {
   if (typeof datapackage === 'string') {
     datapackage = {url: datapackage};
   }
   if (!datapackage.dataPackageJsonUrl) {
     let url = datapackage.path || datapackage.url;
-    url = url.match(absURLRegEx) ? url : resolvePath(url);
-    datapackage = Object.assign(datapackage, identifier.parse(url));
+    if (url) {
+      url = url.match(absURLRegEx) ? url : resolvePath(url);
+      return Object.assign(datapackage, identifier.parse(url));
+    }
   }
   return datapackage;
 }
 
 class Loader {
-  constructor (opts) {
+  /* ::
+  fetch: function
+  */
+
+  constructor (opts /* : Object */) {
     this.fetch = opts.fetch;
   }
 
-  datapackage (datapackage) {
+  datapackage (datapackage /* : DataPackage */) /* : Promise<DataPackage> */ {
     debug('Loading datapackage', datapackage);
     datapackage = normalizeDataPackageUrl(datapackage);
-    const dataPackageJsonUrl = datapackage.dataPackageJsonUrl;
+    const dataPackageJsonUrl /* : string | typeof undefined */ = datapackage.dataPackageJsonUrl;
     return this
       .fetch(dataPackageJsonUrl)
       .catch(err => {
@@ -55,22 +68,26 @@ class Loader {
       .then(res => Object.assign(datapackage, res, datapackage));
   }
 
-  resources (datapackage) {
+  resources (datapackage /* : DataPackage */) /* : Promise<DataPackage> */ {
+    if (!datapackage.resources) {
+      return Promise.resolve(datapackage);
+    }
     return Promise
       .all(datapackage.resources.map(r => this.resource(r)))
       .then(() => datapackage);
   }
 
-  resource (resource) {
+  resource (resource /* : Resource */) /* : Promise<Resource> */ {
     debug('Loading resource', resource);
-    if (!resource.url) {
+    const url = resource.url;
+    if (!url) {
       return Promise.resolve(resource);
     }
     return this
-      .fetch(resource.url)
+      .fetch(url)
       .catch(err => {
         if (err.code === 'ENOENT') {
-          throw new Error(`No DataPackage resource at path '${resource.url}'`);
+          throw new Error(`No DataPackage resource at path '${url}'`);
         }
         /* istanbul ignore next */
         throw err;

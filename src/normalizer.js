@@ -1,15 +1,26 @@
+// @flow
 'use strict';
 
 const urijs = require('urijs');
 const deepExtend = require('deep-extend');
 
+/* ::
+import type MimeLookup from 'mime-lookup';
+import type {Resource, DataPackage} from "./types/datapackage";
+*/
+
 class Normalizer {
-  constructor (opts) {
+  /* ::
+  static index: function
+  mime: MimeLookup
+  */
+
+  constructor (opts /* : Object */) {
     opts = opts || {};
     this.mime = opts.mimeLookup;
   }
 
-  datapackage (datapackage) {
+  datapackage (datapackage /* : DataPackage */) /* : DataPackage */ {
     const path = datapackage.path || datapackage.url;
     const uri = urijs(path);
     const dir = uri.normalizePathname().directory();
@@ -42,7 +53,7 @@ class Normalizer {
     return normalized;
   }
 
-  resources (datapackage) {
+  resources (datapackage /* : DataPackage */) /* : DataPackage */ {
     if (datapackage.resources) {
       datapackage.resources = datapackage.resources.map(resource => this.resource(datapackage, resource));
     }
@@ -50,9 +61,10 @@ class Normalizer {
     return datapackage;
   }
 
-  resource (datapackage, resource) {
+  resource (datapackage /* : DataPackage */, resource /* : string | Resource */) /* : Resource */ {
     if (typeof resource === 'string') {
-      resource = {path: resource};
+      const r /* : Resource */ = {path: resource};
+      resource = r;
     }
 
     if (resource.path || resource.url) {
@@ -73,20 +85,24 @@ class Normalizer {
     }
 
     if (resource.schema && typeof resource.schema === 'string') {
-      resource.schema = datapackage.schemas[resource.schema]; // TODO: check for URLS, catch missing schemas
+      if (datapackage.schemas && Object.prototype.hasOwnProperty.call(datapackage.schemas, resource.schema)) {
+        resource.schema = datapackage.schemas[resource.schema]; // TODO: check for URLS, catch missing schemas
+      }
     }
 
     return resource;
   }
 }
 
-Normalizer.index = function index (datapackage) {
-  datapackage.$resourcesByName = {};
-  datapackage.resources.forEach(r => {
-    if (r.name) {
-      datapackage.$resourcesByName[r.name] = r;
-    }
-  });
+Normalizer.index = function index (datapackage /* : DataPackage */) /* : DataPackage */ {
+  if (datapackage.resources) {
+    datapackage.$resourcesByName = {};
+    datapackage.resources.forEach(r => {
+      if (datapackage.$resourcesByName && r.name) {
+        datapackage.$resourcesByName[r.name] = r;
+      }
+    });
+  }
   return datapackage;
 };
 

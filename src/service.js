@@ -1,3 +1,5 @@
+// @flow
+
 'use strict';
 
 const MimeLookup = require('mime-lookup');
@@ -12,7 +14,17 @@ const translators = require('./lib/translators');
 const types = require('./lib/types');
 const fetch = require('./lib/fetch');
 
+/* ::
+import type {Resource, DataPackage} from "./types/datapackage";
+*/
+
 class DataPackageService {
+  /* ::
+  normalize: Normalizer;
+  processor: Processor;
+  loader: Loader;
+  */
+
   constructor () {
     const mimeLookup = new MimeLookup(mimeDb);
     const schemaProcessor = new SchemaProcessor({types});
@@ -22,27 +34,27 @@ class DataPackageService {
     this.loader = new Loader({fetch});
   }
 
-  normalizePackage (p) {
+  normalizePackage (p /* : DataPackage */) {
     return this.normalize.datapackage(p);
   }
 
-  normalizeResource (p) {
-    return this.normalize.resource(p);
+  normalizeResource (p /* : DataPackage */, r /* : Resource */) {
+    return this.normalize.resource(p, r);
   }
 
-  normalizeResources (p) {
+  normalizeResources (p /* : DataPackage */) {
     return this.normalize.resources(p);
   }
 
-  loadPackage (p) {
+  loadPackage (p /* : DataPackage */) {
     return this.loader.datapackage(p);
   }
 
-  processResource (r) {
+  processResource (r /* : Resource */) {
     return this.processor.resource(r);
   }
 
-  load (datapackage) {
+  load (datapackage /* : DataPackage */)  /* : Promise<DataPackage> */ {
     const self = this;
 
     return self.loader.datapackage(datapackage)

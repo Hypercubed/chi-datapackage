@@ -1,8 +1,10 @@
+// @flow
+
 require('isomorphic-fetch');
 
 const readFile = require('fs').readFile;
 
-function fetchTextFromURL (url) {
+function fetchTextFromURL (url /* : string */) /* : Promise<string> */ {
   if (url.indexOf('file://') === 0) {
     url = url.replace('file://', '');
     return new Promise((resolve, reject) => {

@@ -1,21 +1,35 @@
+// @flow
 'use strict';
 
 const deepExtend = require('deep-extend');
 
+/* ::
+const SchemaProcessor = require('./schema');
+import type {Resource, DataPackage} from "./types/datapackage";
+*/
+
 class Processor {
-  constructor (opts) {
+  /* ::
+  translators: Object;
+  schemaProcessor: SchemaProcessor;
+  */
+
+  constructor (opts /* : Object */) {
     opts = opts || {};
     this.translators = deepExtend({}, opts.translators);
     this.schemaProcessor = opts.schemaProcessor;
   }
 
-  datapackage (dataPackage) {
+  datapackage (dataPackage /* : DataPackage */) /* : DataPackage */ {
     // todo: process schemas?
-    const resources = dataPackage.resources.map(resource => this.resource(resource));
-    return Object.assign(dataPackage, {resources});
+    if (dataPackage.resources && dataPackage.resources.length > 0) {
+      const resources = dataPackage.resources.map(resource => this.resource(resource));
+      return Object.assign(dataPackage, {resources});
+    }
+    return dataPackage;
   }
 
-  resource (resource) {
+  resource (resource /* : Resource */) /* : Resource */ {
     if (resource.content) {
       const translator = this.translators[resource.mediatype];
       if (translator) {
