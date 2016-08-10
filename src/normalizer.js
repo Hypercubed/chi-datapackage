@@ -4,29 +4,24 @@
 const urijs = require('urijs');
 const deepExtend = require('deep-extend');
 
-/* ::
-import type MimeLookup from 'mime-lookup';
-import type {Resource, DataPackage} from "./types/datapackage";
-*/
-
 class Normalizer {
   /* ::
   static index: function
   mime: MimeLookup
   */
 
-  constructor (opts /* : Object */) {
+  constructor (opts /* : { mimeLookup: MimeLookup } */) {
     opts = opts || {};
     this.mime = opts.mimeLookup;
   }
 
   datapackage (datapackage /* : DataPackage */) /* : DataPackage */ {
-    const path = datapackage.path || datapackage.url;
+    const path = datapackage.path || datapackage.url || '';
     const uri = urijs(path);
     const dir = uri.normalizePathname().directory();
     const base = path;
 
-    const normalized = deepExtend({
+    const normalized /* : DataPackage */ = deepExtend({
       path,
       base,
       name: dir,
@@ -36,7 +31,7 @@ class Normalizer {
     }, datapackage);
 
     ['image', 'readme'].forEach(key => {
-      if ({}.hasOwnProperty.call(normalized, key)) {
+      if (normalized[key]) {
         normalized[key] = urijs(normalized[key], base).href();
       }
     });
@@ -44,7 +39,7 @@ class Normalizer {
     if (normalized.schemas) {
       const schemas = normalized.schemas;
       for (const key in schemas) {
-        if ({}.hasOwnProperty.call(schemas, key)) {
+        if (schemas[key]) {
           schemas[key].key = schemas[key].key || key;
         }
       }
@@ -57,8 +52,7 @@ class Normalizer {
     if (datapackage.resources) {
       datapackage.resources = datapackage.resources.map(resource => this.resource(datapackage, resource));
     }
-    Normalizer.index(datapackage);
-    return datapackage;
+    return Normalizer.index(datapackage);
   }
 
   resource (datapackage /* : DataPackage */, resource /* : string | Resource */) /* : Resource */ {
@@ -68,7 +62,7 @@ class Normalizer {
     }
 
     if (resource.path || resource.url) {
-      const uri = urijs(resource.path || resource.url);
+      const uri = urijs(resource.path || resource.url || '');
 
       resource.format = resource.format || uri.suffix();
       resource.name = resource.name || uri.filename();

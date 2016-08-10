@@ -1,23 +1,31 @@
 // @flow
 
-const Papa = require('babyparse');
+const parse = require('babyparse').parse;
 
-function matrixParse (content /* : string | typeof undefined */, dialect /* : Object | typeof undefined */) /* : Object */ {
+/* ::
+type Matrix = {
+  columns: Array<string>,
+  rows: Array<string>,
+  table: Array<Array<any>>
+}
+*/
+
+function matrixParse (content /* : string | void */, dialect /* : Object | void */) /* : Object */ {
   dialect = Object.assign({
     delimiter: '\t',
     fastMode: false,
     skipEmptyLines: true,
     comments: '#'
   }, dialect);
-  const parsed = Papa.parse(content, dialect);
+  const parsed = parse(content, dialect);
   parsed.data = convertToPlainMatrix(parsed.data);
   return parsed;
 }
 
-function convertToPlainMatrix (table /* : Object */) /* : Object */ {
+function convertToPlainMatrix (table /* : Array<Array<any>> */) /* : Matrix */ {
   table = table.slice();
-  const columns = table.splice(0, 1)[0].slice(1);
-  const rows = table.map(d => d.splice(0, 1)[0]);
+  const columns /* : Array<string> */ = table.splice(0, 1)[0].slice(1);
+  const rows /* : Array<string> */ = table.map((d /* : Array<string> */) => d.splice(0, 1)[0]);
   return {
     columns,
     rows,

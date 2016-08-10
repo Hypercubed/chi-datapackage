@@ -9,22 +9,18 @@ const deepExtend = require('deep-extend');
 
 // TODO: https://github.com/frictionlessdata/jsontableschema-js
 
-/* ::
-import type {Resource, DataPackage} from "./types/datapackage";
-*/
-
 class Schema {
   /* ::
-  types: Object
+  types: TypesMap
   */
 
-  constructor (opts /* : Object */) {
+  constructor (opts /* : { types: TypesMap } */) {
     opts = opts || {};
     deepExtend(this, opts);
   }
 
-  generate (schema /* : Object */) /* : Object */ {
-    const castMap = {};
+  generate (schema /* : SchemaType */) /* : CastMap */ {
+    const castMap /* : CastMap */ = {};
     schema.fields.forEach(field => {
       const fn = this.generateCastFn(field);
       if (fn) {
@@ -34,13 +30,13 @@ class Schema {
     return castMap;
   }
 
-  generateCastFn (field /* : Object */) /* : function | null */ {
+  generateCastFn (field /* : FieldType */) /* : function | null */ {
     if (!field.type || !Object.prototype.hasOwnProperty.call(this.types, field.type)) {
       return null;
     }
     const type = this.types[field.type];
     let format = field.format || 'default';
-    let pattern = null;
+    let pattern /* : string | null */ = null;
     if (format.indexOf(':') !== -1) {
       const s = format.split(':');
       format = s[0];
@@ -57,11 +53,11 @@ class Schema {
       return {data};
     }
 
-    const schema = resource.schema || (resource.schema = {});
-    const castMap = resource.schema.$castMap || (schema.$castMap = this.generate(schema));
+    const schema /* : SchemaType */ = resource.schema;
+    const castMap /* : CastMap */ = schema.$castMap || (schema.$castMap = this.generate(schema));
 
-    data = data.map(d => {
-      const r = {};
+    data = data.map((d /* : Object */) /* : Object */ => {
+      const r /* : Object */ = {};
       for (const key in d) { /* eslint guard-for-in: 0 */
         r[key] = (key in castMap) ? castMap[key](d[key]) : d[key];
       }

@@ -5,16 +5,15 @@ const deepExtend = require('deep-extend');
 
 /* ::
 const SchemaProcessor = require('./schema');
-import type {Resource, DataPackage} from "./types/datapackage";
 */
 
 class Processor {
   /* ::
-  translators: Object;
+  translators: TranslatorsMap;
   schemaProcessor: SchemaProcessor;
   */
 
-  constructor (opts /* : Object */) {
+  constructor (opts /* : {translators: TranslatorsMap, schemaProcessor: SchemaProcessor} */) {
     opts = opts || {};
     this.translators = deepExtend({}, opts.translators);
     this.schemaProcessor = opts.schemaProcessor;
@@ -30,7 +29,7 @@ class Processor {
   }
 
   resource (resource /* : Resource */) /* : Resource */ {
-    if (resource.content) {
+    if (resource.content && resource.mediatype) {
       const translator = this.translators[resource.mediatype];
       if (translator) {
         Object.assign(resource, translator(resource));

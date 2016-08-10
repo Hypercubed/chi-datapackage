@@ -3,13 +3,13 @@
 'use strict';
 
 /* ::
-import type {Resource, DataPackage} from "./types/datapackage";
+type fetch = (url: string) => Promise<string>;
 */
 
 const debug = require('debug')('Loader');
-const parse = require('json5').parse;
+const jsonParse = require('json5').parse;
 
-const identifier = require('datapackage-identifier');
+const idParse = require('datapackage-identifier').parse;
 
 const absURLRegEx = /^([^\/]+:\/\/|\/)/;
 
@@ -36,7 +36,7 @@ function normalizeDataPackageUrl (datapackage /* : string | DataPackage */) /* :
     let url = datapackage.path || datapackage.url;
     if (url) {
       url = url.match(absURLRegEx) ? url : resolvePath(url);
-      return Object.assign(datapackage, identifier.parse(url));
+      return Object.assign(datapackage, idParse(url));
     }
   }
   return datapackage;
@@ -44,10 +44,10 @@ function normalizeDataPackageUrl (datapackage /* : string | DataPackage */) /* :
 
 class Loader {
   /* ::
-  fetch: function
+  fetch: fetch;
   */
 
-  constructor (opts /* : Object */) {
+  constructor (opts /* : { fetch: fetch } */) {
     this.fetch = opts.fetch;
   }
 
@@ -57,15 +57,15 @@ class Loader {
     const dataPackageJsonUrl /* : string | typeof undefined */ = datapackage.dataPackageJsonUrl;
     return this
       .fetch(dataPackageJsonUrl)
-      .catch(err => {
+      .catch((err /* : Object */) => {
         if (err.code === 'ENOENT') {
           throw new Error(`No DataPackage at path '${dataPackageJsonUrl}'`);
         }
         /* istanbul ignore next */
         throw err;
       })
-      .then(parse)
-      .then(res => Object.assign(datapackage, res, datapackage));
+      .then(jsonParse)
+      .then((res /* : Object */) => Object.assign(datapackage, res, datapackage));
   }
 
   resources (datapackage /* : DataPackage */) /* : Promise<DataPackage> */ {
@@ -85,14 +85,14 @@ class Loader {
     }
     return this
       .fetch(url)
-      .catch(err => {
+      .catch((err /* : Object */) => {
         if (err.code === 'ENOENT') {
           throw new Error(`No DataPackage resource at path '${url}'`);
         }
         /* istanbul ignore next */
         throw err;
       })
-      .then(res => {
+      .then((res /* : string */) => {
         resource.content = res;
         return resource;
       });

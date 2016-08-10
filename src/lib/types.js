@@ -1,13 +1,13 @@
 // @flow
 
-const d3time = require('d3-time-format');
+const utcParse = require('d3-time-format').utcParse;
 const parseIsoDuration = require('parse-iso-duration');
 
 const jsonParse = require('./json');
 
 const TRUE_VALUES = ['yes', 'y', 'true', 't', '1'];
 
-const typeToCast = {
+const typeToCast /* : TypesMap */= {
   string: {
     default: String
     /* todo: format, uri, email, binary? */
@@ -20,19 +20,19 @@ const typeToCast = {
     // todo: currency?
   },
   datetime: {
-    default: d3time.utcParse('%Y-%m-%dT%H:%M:%SZ'),
-    fmt: d3time.utcParse,
+    default: utcParse('%Y-%m-%dT%H:%M:%SZ'),
+    fmt: utcParse,
     any: (d /* : string | Date */) => new Date(d)
   },
   date: {
-    default: d3time.utcParse('%Y-%m-%d'),
-    fmt: d3time.utcParse,
-    yyyy: d3time.utcParse('%Y'),
+    default: utcParse('%Y-%m-%d'),
+    fmt: utcParse,
+    yyyy: utcParse('%Y'),
     any: (d /* : string | Date */) => new Date(d)
   },
   time: {
-    default: d3time.utcParse('%H:%M:%S'),
-    fmt: d3time.utcParse,
+    default: utcParse('%H:%M:%S'),
+    fmt: utcParse,
     any: (d /* : string | Date */) => new Date(d)
   },
   duration: {

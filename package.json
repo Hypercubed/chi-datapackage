@@ -10,7 +10,7 @@
   "scripts": {
     "check": "npm run flow && xo && ava",
     "test": "ava",
-    "build": "babel src -d dist && cp ./src/lib/mime.json ./dist/lib/",
+    "build": "babel --no-comments --compact true src -d dist",
     "coverage": "nyc --reporter=lcov --reporter=text ava",
     "prepublish": "npm run build && npm run check",
     "version": "chg release -y && git add -A CHANGELOG.md",
@@ -30,6 +30,7 @@
   "xo": {
     "esnext": true,
     "space": 2,
+    "ignores": ["{flow-typed,decls}/**"],
     "envs": [
       "node",
       "browser"

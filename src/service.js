@@ -5,18 +5,14 @@
 const MimeLookup = require('mime-lookup');
 
 const Normalizer = require('./normalizer');
-const Processor = require('./processor.js');
+const Processor = require('./processor');
 const SchemaProcessor = require('./schema');
 const Loader = require('./loader');
 
-const mimeDb = require('./lib/mime.json');
+const mimeDb = require('./lib/mime');
 const translators = require('./lib/translators');
 const types = require('./lib/types');
 const fetch = require('./lib/fetch');
-
-/* ::
-import type {Resource, DataPackage} from "./types/datapackage";
-*/
 
 class DataPackageService {
   /* ::
@@ -34,34 +30,32 @@ class DataPackageService {
     this.loader = new Loader({fetch});
   }
 
-  normalizePackage (p /* : DataPackage */) {
+  normalizePackage (p /* : DataPackage */) /* : DataPackage */ {
     return this.normalize.datapackage(p);
   }
 
-  normalizeResource (p /* : DataPackage */, r /* : Resource */) {
+  normalizeResource (p /* : DataPackage */, r /* : Resource */) /* : Resource */ {
     return this.normalize.resource(p, r);
   }
 
-  normalizeResources (p /* : DataPackage */) {
+  normalizeResources (p /* : DataPackage */) /* : DataPackage */ {
     return this.normalize.resources(p);
   }
 
-  loadPackage (p /* : DataPackage */) {
+  loadPackage (p /* : DataPackage */) /* : Promise<DataPackage> */ {
     return this.loader.datapackage(p);
   }
 
-  processResource (r /* : Resource */) {
+  processResource (r /* : Resource */) /* : Resource */ {
     return this.processor.resource(r);
   }
 
   load (datapackage /* : DataPackage */)  /* : Promise<DataPackage> */ {
-    const self = this;
-
-    return self.loader.datapackage(datapackage)
-      .then(p => self.normalize.datapackage(p))
-      .then(p => self.normalize.resources(p))
-      .then(p => self.loader.resources(p))
-      .then(p => self.processor.datapackage(p));
+    return this.loader.datapackage(datapackage)
+      .then(p => this.normalize.datapackage(p))
+      .then(p => this.normalize.resources(p))
+      .then(p => this.loader.resources(p))
+      .then(p => this.processor.datapackage(p));
   }
 }
 

@@ -2,27 +2,25 @@
 
 'use strict';
 
-const Papa = require('babyparse');
+const parse = require('babyparse').parse;
 const safeLoad = require('js-yaml').safeLoad;
 const setLineEnding = require('crlf-helper').setLineEnding;
-
-const dos2unix = content => setLineEnding(content, 'LF');
 
 const jsonParse = require('./json');
 const matrixParse = require('./matrix');
 
-/* ::
-import type {Resource, DataPackage} from "../types/datapackage";
-*/
+function dos2unix (content) {
+  return setLineEnding(content, 'LF');
+}
 
-module.exports = {
+const defaultTranslatorsMap /* : TranslatorsMap */ = {
   'text/tab-separated-values': (resource /* : Resource */) => {
     const dialect = Object.assign({
       header: true,
       delimiter: '\t',
       skipEmptyLines: true
     }, resource.dialect);
-    return Papa.parse(resource.content, dialect);
+    return parse(resource.content, dialect);
   },
 
   'text/csv': (resource /* : Resource */) => {
@@ -31,7 +29,7 @@ module.exports = {
       delimiter: ',',
       skipEmptyLines: true
     }, resource.dialect);
-    return Papa.parse(resource.content, dialect);
+    return parse(resource.content, dialect);
   },
 
   'text/plain': (resource /* : Resource */) => ({data: dos2unix(resource.content)}),
@@ -42,3 +40,5 @@ module.exports = {
 
   'application/json': (resource /* : Resource */) => ({data: jsonParse(resource.content)})
 };
+
+module.exports = defaultTranslatorsMap;

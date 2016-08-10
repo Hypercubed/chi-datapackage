@@ -1,8 +1,8 @@
 // @flow
 
-require('isomorphic-fetch');
-
 const readFile = require('fs').readFile;
+
+const fetch = require('isomorphic-fetch');
 
 function fetchTextFromURL (url /* : string */) /* : Promise<string> */ {
   if (url.indexOf('file://') === 0) {
@@ -25,7 +25,5 @@ function fetchTextFromURL (url /* : string */) /* : Promise<string> */ {
       return response.text();
     });
 }
-
-// TODO: Browser
 
 module.exports = fetchTextFromURL;
