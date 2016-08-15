@@ -8,84 +8,126 @@ const schemaProcessor = new SchemaProcessor({types});
 
 const utc = (...args) => new Date(Date.UTC(...args));
 
-function castMacro ({format, type}) {
-  format = format || 'default';
-  const fn = schemaProcessor.generateCastFn({format, type});
+test('string', t => {
+  const fn = schemaProcessor.generateCastFn({type: 'string'});
+  t.is(fn(1.9), '1.9');
+  t.is(fn(true), 'true');
+  t.is(fn(false), 'false');
+  t.is(fn(new Date('2019-01-02')), new Date('2019-01-02').toString());
+});
 
-  macro.title = (providedTitle, input, expected) => `${type}.${format} ${input} --> ${fn(input)} === ${expected}`.trim();
-  return macro;
+test('number', t => {
+  const fn = schemaProcessor.generateCastFn({type: 'number'});
+  t.is(fn('1'), 1);
+  t.is(fn('1.2'), 1.2);
+  t.is(fn('1.2e3'), 1.2e3);
+  t.is(fn(1), 1);
+  t.is(fn(1.2), 1.2);
+  t.true(Number.isNaN(fn('NaN')));
+  t.is(fn('INF'), Infinity);
+  t.is(fn('-INF'), -Infinity);
 
-  function macro (t, input, expected) {
-    if (typeof expected === 'object') {
-      return t.deepEqual(fn(input), expected);
-    }
-    t.is(fn(input), expected);
-  }
-}
+  t.throws(() => fn('unknown'));
+});
 
-const STRING = castMacro({type: 'string'});
-const NUMBER = castMacro({type: 'number'});
-const INTEGER = castMacro({type: 'integer'});
-const DATE = castMacro({type: 'date'});
-const DATE_ANY = castMacro({type: 'date', format: 'any'});
-const DATE_FMT = castMacro({type: 'date', format: 'fmt:%Y'});
-const DATETIME = castMacro({type: 'datetime'});
-const DURATION = castMacro({type: 'duration'});
-const TIME = castMacro({type: 'time'});
-const BOOLEAN = castMacro({type: 'boolean'});
-const OBJECT = castMacro({type: 'object'});
+test('integer', t => {
+  const fn = schemaProcessor.generateCastFn({type: 'integer'});
+  t.is(fn('1'), 1);
+  t.is(fn(1), 1);
+  t.true(Number.isNaN(fn('NaN')));
+  t.is(fn('INF'), Infinity);
+  t.is(fn('-INF'), -Infinity);
 
-test(STRING, 1.9, '1.9');
-test(STRING, true, 'true');
-test(STRING, false, 'false');
-test(STRING, new Date('2019-01-02'), new Date('2019-01-02').toString());
+  t.throws(() => fn('1.1'));
+  t.throws(() => fn('unknown'));
+});
 
-test(NUMBER, '1', 1);
-test(NUMBER, '1.2', 1.2);
-test(NUMBER, 1, 1);
-test(NUMBER, 1.2, 1.2);
+test('datetime', t => {
+  const fn = schemaProcessor.generateCastFn({type: 'datetime'});
+  t.deepEqual(fn('1990-01-01T00:00:00Z'), utc(1990, 0, 1, 0, 0, 0));
+  t.deepEqual(fn('2011-12-31T23:59:59Z'), utc(2011, 11, 31, 23, 59, 59));
 
-test(INTEGER, '1', 1);
-test(INTEGER, '1.2', 1);
-test(INTEGER, '1.9', 1);
-test(INTEGER, 1, 1);
-test(INTEGER, 1.2, 1);
-test(INTEGER, 1.9, 1);
+  t.throws(() => fn('unknown'));
+});
 
-test(DATETIME, '1990-01-01T00:00:00Z', utc(1990, 0, 1, 0, 0, 0));
-test(DATETIME, '2011-12-31T23:59:59Z', utc(2011, 11, 31, 23, 59, 59));
+test('date', t => {
+  const fn = schemaProcessor.generateCastFn({type: 'date'});
+  t.deepEqual(fn('1990-01-01'), utc(1990, 0, 1));
+  t.deepEqual(fn('2011-12-31'), utc(2011, 11, 31));
 
-test(DATE, '1990-01-01', utc(1990, 0, 1));
-test(DATE, '2011-12-31', utc(2011, 11, 31));
+  t.throws(() => fn('unknown'));
+});
 
-test(TIME, '09:00:00', utc(1900, 0, 1, 9, 0, 0));
-test(TIME, '18:00:00', utc(1900, 0, 1, 18, 0, 0));
+test('date, any', t => {
+  const fn = schemaProcessor.generateCastFn({type: 'date', format: 'any'});
+  t.deepEqual(fn('2011/12/31 23:59:59Z'), utc(2011, 11, 31, 23, 59, 59));
+  t.deepEqual(fn('2011'), new Date('2011'));
 
-test(DATE_ANY, '2011/12/31 23:59:59Z', utc(2011, 11, 31, 23, 59, 59));
-test(DATE_ANY, '2011', new Date('2011'));
+  t.throws(() => fn('unknown'));
+});
 
-test(DATE_FMT, '2011', utc(2011, 0, 1, 0, 0, 0));
+test('date, fmt', t => {
+  const fn = schemaProcessor.generateCastFn({type: 'date', format: 'fmt:%Y'});
+  t.deepEqual(fn('2011'), utc(2011, 0, 1, 0, 0, 0));
 
-test(DURATION, 'PT8S', 8 * 1000);
-test(DURATION, 'PT10M', 10 * 60 * 1000);
-test(DURATION, 'PT20H', 20 * 60 * 60 * 1000);
-test(DURATION, 'PT6M4S', (6 * 60 * 1000) + 4000);
+  t.throws(() => fn('unknown'));
+});
 
-test(BOOLEAN, true, true);
-test(BOOLEAN, false, false);
-test(BOOLEAN, 'true', true);
-test(BOOLEAN, 'false', false);
-test(BOOLEAN, 't', true);
-test(BOOLEAN, 'f', false);
-test(BOOLEAN, '1', true);
-test(BOOLEAN, '0', false);
-test(BOOLEAN, 'yes', true);
-test(BOOLEAN, 'no', false);
-test(BOOLEAN, 'y', true);
-test(BOOLEAN, 'n', false);
+test('time', t => {
+  const fn = schemaProcessor.generateCastFn({type: 'time'});
+  t.deepEqual(fn('09:00:00'), utc(1900, 0, 1, 9, 0, 0));
+  t.deepEqual(fn('18:00:00'), utc(1900, 0, 1, 18, 0, 0));
 
-test(OBJECT, '{}', {});
-test(OBJECT, '{"foo": "bar", "baz": true, "buzz": 10}', {foo: 'bar', baz: true, buzz: 10});
-test(OBJECT, '{foo: "bar", baz: true, "buzz": 10}', {foo: 'bar', baz: true, buzz: 10});
-test(OBJECT, '[]', []);
-test(OBJECT, '[1,2,3]', [1, 2, 3]);
+  t.throws(() => fn('unknown'));
+});
+
+test('duration', t => {
+  const fn = schemaProcessor.generateCastFn({type: 'duration'});
+  t.is(fn('PT8S'), 8 * 1000);
+  t.is(fn('PT10M'), 10 * 60 * 1000);
+  t.is(fn('PT20H'), 20 * 60 * 60 * 1000);
+  t.is(fn('PT6M4S'), (6 * 60 * 1000) + 4000);
+
+  t.throws(() => fn('unknown'));
+});
+
+test('boolean', t => {
+  const fn = schemaProcessor.generateCastFn({type: 'boolean'});
+  t.is(fn(true), true);
+  t.is(fn(false), false);
+  t.is(fn('true'), true);
+  t.is(fn('false'), false);
+  t.is(fn('t'), true);
+  t.is(fn('f'), false);
+  t.is(fn('T'), true);
+  t.is(fn('F'), false);
+  t.is(fn('1'), true);
+  t.is(fn('0'), false);
+  t.is(fn('yes'), true);
+  t.is(fn('no'), false);
+  t.is(fn('y'), true);
+  t.is(fn('n'), false);
+
+  t.throws(() => fn('unknown'));
+});
+
+test('object', t => {
+  const fn = schemaProcessor.generateCastFn({type: 'object'});
+  t.deepEqual(fn('{}'), {});
+  t.deepEqual(fn('{"foo": "bar", "baz": true, "buzz": 10}'), {foo: 'bar', baz: true, buzz: 10});
+  t.deepEqual(fn('{foo: "bar", baz: true, "buzz": 10}'), {foo: 'bar', baz: true, buzz: 10});
+
+  t.throws(() => fn('unknown'));
+  t.throws(() => fn('{"foo": "bar"'));
+  t.throws(() => fn('[1,2,3]'));
+});
+
+test('array', t => {
+  const fn = schemaProcessor.generateCastFn({type: 'array'});
+  t.deepEqual(fn('[]'), []);
+  t.deepEqual(fn('[1,2,3]'), [1, 2, 3]);
+
+  t.throws(() => fn('unknown'));
+  t.throws(() => fn('[1,2,3'));
+  t.throws(() => fn('{"foo": "bar"}'));
+});

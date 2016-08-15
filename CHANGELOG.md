@@ -2,7 +2,9 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* add support for missingValues
+* Support NaN, INF, and -INF in number and integer types
+* Types are now strict
 
 --------------------
 

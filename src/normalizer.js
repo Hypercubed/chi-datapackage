@@ -42,6 +42,7 @@ class Normalizer {
     return normalized;
   }
 
+  // TODO: 1.0.0-beta.15: only one of url, path, data present
   resources (datapackage) {
     if (datapackage.resources) {
       datapackage.resources = datapackage.resources.map(resource => this.resource(datapackage, resource));

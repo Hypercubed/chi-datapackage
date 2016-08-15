@@ -1,9 +1,85 @@
 const d3time = require('d3-time-format');
 const parseIsoDuration = require('parse-iso-duration');
 
-const jsonParse = require('./json');
+const parse = require('json5').parse;
+
+const INVALID_TYPE = 'chi-datapackage: Invalid type';
+
+function jsonParse (isArray) {
+  return function (d) {
+    const c = parse(d);
+    if (Array.isArray(c) !== isArray) {
+      throw new Error(INVALID_TYPE);
+    }
+    return c;
+  };
+}
+
+function utcParse (fmt) {
+  const fn = d3time.utcParse(fmt);
+  return function (d) {
+    const c = fn(d);
+    if (Number.isNaN(c) || c === null) {
+      throw new Error(INVALID_TYPE);
+    }
+    return c;
+  };
+}
+
+function dateParse (d) {
+  const c = new Date(d);
+  if (isNaN(c.getTime())) {
+    throw new Error(INVALID_TYPE);
+  }
+  return c;
+}
+
+const checkSpecialNumbers = fn => d => {
+  if (d === 'INF' || d === Infinity) {
+    return Infinity;
+  }
+  if (d === '-INF' || d === -Infinity) {
+    return -Infinity;
+  }
+  if (d === 'NaN' || Number.isNaN(d)) {
+    return NaN;
+  }
+  const c = fn(d);
+  if (Number.isNaN(c)) {
+    throw new Error(INVALID_TYPE);
+  }
+  return c;
+};
+
+function castNumber (value) {
+  if (typeof value === 'number') {
+    return value;
+  }
+  return Number(value);
+}
+
+function castInt (value) {
+  if (/^(\-|\+)?([0-9]+|Infinity)$/.test(String(value))) {
+    return castNumber(value);
+  }
+  throw new Error(INVALID_TYPE);
+}
 
 const TRUE_VALUES = ['yes', 'y', 'true', 't', '1'];
+const FALSE_VALUES = ['no', 'n', 'false', 'f', '0'];
+
+function castBoolean (value) {
+  if (typeof value === 'boolean') {
+    return value;
+  }
+  if (TRUE_VALUES.indexOf(String(value).toLowerCase()) !== -1) {
+    return true;
+  }
+  if (FALSE_VALUES.indexOf(String(value).toLowerCase()) !== -1) {
+    return false;
+  }
+  throw new Error(INVALID_TYPE);
+}
 
 const typeToCast = {
   string: {
@@ -11,39 +87,42 @@ const typeToCast = {
     /* todo: format, uri, email, binary? */
   },
   integer: {
-    default: parseInt
+    default: checkSpecialNumbers(castInt)
   },
   number: {
-    default: parseFloat
+    default: checkSpecialNumbers(castNumber)
     // todo: currency?
   },
   datetime: {
-    default: d3time.utcParse('%Y-%m-%dT%H:%M:%SZ'),
-    fmt: d3time.utcParse,
-    any: d => new Date(d)
+    default: utcParse('%Y-%m-%dT%H:%M:%SZ'),
+    fmt: utcParse,
+    any: dateParse
   },
   date: {
-    default: d3time.utcParse('%Y-%m-%d'),
-    fmt: d3time.utcParse,
-    yyyy: d3time.utcParse('%Y'),
-    any: d => new Date(d)
+    default: utcParse('%Y-%m-%d'),
+    fmt: utcParse,
+    yyyy: utcParse('%Y'),
+    any: dateParse
   },
   time: {
-    default: d3time.utcParse('%H:%M:%S'),
-    fmt: d3time.utcParse,
-    any: d => new Date(d)
+    default: utcParse('%H:%M:%S'),
+    fmt: utcParse,
+    any: dateParse
   },
   duration: {
     default: parseIsoDuration
   },
   boolean: {
-    default: d => d === true || TRUE_VALUES.indexOf(String(d).toLowerCase()) !== -1
+    default: castBoolean
   },
   object: {
-    default: jsonParse
+    default: jsonParse(false),
+    any: parse
+  },
+  array: {
+    default: jsonParse(true),
+    any: parse
   }
 };
-
-typeToCast.array = typeToCast.object;
 
 module.exports = typeToCast;

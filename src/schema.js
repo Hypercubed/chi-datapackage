@@ -7,6 +7,30 @@ const deepExtend = require('deep-extend');
 
 // TODO: https://github.com/frictionlessdata/jsontableschema-js
 
+function nullCheck (mv, fn) {
+  return d => {
+    if (mv.indexOf(d) !== -1) {
+      return null;
+    }
+    return fn(d);
+  };
+}
+
+function normalizeField (input) {
+  const r = Object.assign({
+    format: 'default',
+    missingValues: input.type === 'string' ? undefined : [''],
+    pattern: null
+  }, input);
+  r.missingValues = Array.isArray(r.missingValues) ? r.missingValues : [r.missingValues];
+  if (r.format.indexOf(':') !== -1) {
+    const s = r.format.split(':');
+    r.format = s[0];
+    r.pattern = s[1];
+  }
+  return r;
+}
+
 class Schema {
   constructor (opts) {
     opts = opts || {};
@@ -25,39 +49,36 @@ class Schema {
   }
 
   generateCastFn (field) {
+    field = normalizeField(field);
     if (!field.type || !Object.prototype.hasOwnProperty.call(this.types, field.type)) {
       return null;
     }
     const type = this.types[field.type];
-    let format = field.format || 'default';
-    let pattern = null;
-    if (format.indexOf(':') !== -1) {
-      const s = format.split(':');
-      format = s[0];
-      pattern = s[1];
+    let map = type[field.format];
+    if (field.pattern) {
+      map = map(field.pattern);
     }
-    const map = type[format] || type.default;
-    return pattern ? map(pattern) : map;
+    if (field.missingValues) {
+      return nullCheck(field.missingValues, map);
+    }
+    return map;
   }
 
   process (resource) {
-    let data = resource.data;
     /* istanbul ignore if */
-    if (!Array.isArray(data)) {
-      return {data};
+    if (!Array.isArray(resource.data)) {
+      return {data: resource.data};
     }
 
     const castMap = resource.schema.$castMap || (resource.schema.$castMap = this.generate(resource.schema));
 
-    data = data.map(d => {
+    return {data: resource.data.map(d => {
       const r = {};
       for (const key in d) { /* eslint guard-for-in: 0 */
         r[key] = (key in castMap) ? castMap[key](d[key]) : d[key];
       }
       return r;
-    });
-
-    return {data};
+    })};
   }
 }
 
