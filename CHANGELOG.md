@@ -2,11 +2,14 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 2.2.0 (2016-08-15)
 * add support for missingValues
 * Support NaN, INF, and -INF in number and integer types
 * Types are now strict
-
---------------------
 
 ## 2.1.1 (2016-08-09)
 * Fixed bug in DataPackageService:normalizeResource
