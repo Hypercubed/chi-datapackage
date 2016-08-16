@@ -1,9 +1,16 @@
 /* eslint node/no-unsupported-features: 0 */
 import test from 'ava';
+import nock from 'nock';
 
 import dp from '../';
 
 const json = [{A: '1', B: '2', C: '3'}, {A: '4', B: '5', C: '6'}];
+
+const gdp = require('./fixtures/gdp/datapackage.json');
+
+nock('http://raw.githubusercontent.com')
+  .get('/datasets/gdp/master/datapackage.json')
+  .reply(200, gdp);
 
 test('normalize simple datapackage resources', async t => {
   const s = await dp.loadPackage('fixtures/loaded/');

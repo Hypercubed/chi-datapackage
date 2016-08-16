@@ -1,5 +1,8 @@
 /* eslint node/no-unsupported-features: 0 */
+import fs from 'fs';
+
 import test from 'ava';
+import nock from 'nock';
 
 import dp from '../';
 
@@ -11,6 +14,31 @@ const matrix = {
   rows: ['1', '4'],
   table: [['2', '3'], ['5', '6']]
 };
+
+function readFilePromise (path) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(path, (error, content) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(content);
+      }
+    });
+  });
+}
+
+async function setupHttp () {
+  const gdp = await readFilePromise('./fixtures/gdp/datapackage.json');
+  const csv = await readFilePromise('./fixtures/gdp/data/gdp.csv');
+
+  nock('http://raw.githubusercontent.com')
+    .get('/datasets/gdp/master/datapackage.json')
+    .reply(200, gdp);
+
+  nock('http://raw.githubusercontent.com')
+    .get('/datasets/gdp/master/data/gdp.csv')
+    .reply(200, csv);
+}
 
 test('process inline-content', async t => {
   const p = await dp.load('fixtures/inline/');
@@ -68,6 +96,8 @@ test('process gold-prices', async t => {
 });
 
 test('process gold-prices - from url', async t => {
+  await setupHttp();
+
   const p = await dp.load('http://github.com/datasets/gdp');
 
   t.is(p.resources[0].data.length, 10379);
@@ -80,6 +110,8 @@ test('process gold-prices - from url', async t => {
 });
 
 test('process gold-prices - from url object', async t => {
+  await setupHttp();
+
   const p = await dp.load({url: 'http://github.com/datasets/gdp'});
 
   t.is(p.resources[0].data.length, 10379);
