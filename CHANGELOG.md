@@ -2,13 +2,16 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+--------------------
+
+## 3.0.0 (2016-08-19)
 * Assign cuid to resources without name
 * Record errors while processing data
 * Add normalizeSchemas to DataPackageService
 * Now normalize schemas after resources
 * Generate missing readable title from field name
-
---------------------
 
 ## 2.2.0 (2016-08-15)
 * add support for missingValues
