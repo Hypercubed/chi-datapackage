@@ -2,7 +2,11 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* Assign cuid to resources without name
+* Record errors while processing data
+* Add normalizeSchemas to DataPackageService
+* Now normalize schemas after resources
+* Generate missing readable title from field name
 
 --------------------
 

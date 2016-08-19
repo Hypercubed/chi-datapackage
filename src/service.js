@@ -15,41 +15,98 @@ const fetch = require('./lib/fetch');
 class DataPackageService {
   constructor () {
     const mimeLookup = new MimeLookup(mimeDb);
-    const schemaProcessor = new SchemaProcessor({types});
 
+    this.schemaProcessor = new SchemaProcessor({types});
     this.normalize = new Normalizer({mimeLookup});
-    this.processor = new Processor({translators, schemaProcessor});
+    this.processor = new Processor({translators, schemaProcessor: this.schemaProcessor});
     this.loader = new Loader({fetch});
   }
 
   normalizePackage (p) {
-    return this.normalize.datapackage(p);
+    return Object.assign(p, this.normalize.datapackage(p));
   }
 
   normalizeResource (p, r) {
-    return this.normalize.resource(p, r);
+    return Object.assign(r, this.normalize.resource(p, r));
   }
 
   normalizeResources (p) {
-    return this.normalize.resources(p);
+    p.resources = (Array.isArray(p.resources)) ? p.resources.map(r => this.normalize.resource(p, r)) : [];
+    p.$resourcesByName = Normalizer.index(p);
+    return p;
+  }
+
+  normalizeSchemas (p) {
+    const schemas = p.schemas;
+
+    p.resources.forEach(r => {
+      if (r.schema) {
+        if (typeof r.schema === 'string') {
+          r.schema = schemas[r.schema]; // TODO: check for URLS, catch missing schemas
+        } else {
+          schemas[`@@${r.name}:schema`] = r.schema;
+        }
+      }
+    });
+
+    for (const key in p.schemas) {
+      if (Object.prototype.hasOwnProperty.call(p.schemas, key)) {
+        p.schemas[key].key = p.schemas[key].key || key;
+        p.schemas[key].fields = p.schemas[key].fields.map(f => this.schemaProcessor.normalizeField(f));
+      }
+    }
+
+    return p;
   }
 
   loadPackage (p) {
     return this.loader.datapackage(p);
   }
 
+  loadResources (p) {
+    return this.loader.resources(p.resources)
+      .then(r => {
+        p.resources = r;
+        return p;
+      });
+  }
+
   processResource (r) {
-    return this.processor.resource(r);
+    try {
+      return Object.assign(r, this.processor.resource(r));
+    } catch (err) {
+      return Object.assign(r, {$valid: false, $error: err});
+    }
+  }
+
+  processPackage (p) {
+    Object.assign(p, this.processor.datapackage(p));
+    p.$resourcesByName = Normalizer.index(p);
+    return p;
+  }
+
+  updateResource (p, r) {
+    Object.assign(r, this.normalize.resource(p, r));
+    p.$resourcesByName = Normalizer.index(p);
+    return Object.assign(r, this.processor.resource(r));
+  }
+
+  addResource (p, r) {
+    p.resources.push(r);
+    Object.assign(r, this.normalize.resource(p, r));
+    p.$resourcesByName = Normalizer.index(p);
+    return Object.assign(r, this.processor.resource(r));
   }
 
   load (datapackage) {
     const self = this;
 
     return self.loader.datapackage(datapackage)
-      .then(p => self.normalize.datapackage(p))
-      .then(p => self.normalize.resources(p))
-      .then(p => self.loader.resources(p))
-      .then(p => self.processor.datapackage(p));
+      .then(p => self.normalizePackage(p))
+      .then(p => self.normalizeResources(p))
+      .then(p => self.normalizeSchemas(p))
+      .then(p => self.loadResources(p))
+      .then(p => self.processPackage(p));
   }
 }
 

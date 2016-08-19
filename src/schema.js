@@ -16,40 +16,45 @@ function nullCheck (mv, fn) {
   };
 }
 
-function normalizeField (input) {
-  const r = Object.assign({
-    format: 'default',
-    missingValues: input.type === 'string' ? undefined : [''],
-    pattern: null
-  }, input);
-  r.missingValues = Array.isArray(r.missingValues) ? r.missingValues : [r.missingValues];
-  if (r.format.indexOf(':') !== -1) {
-    const s = r.format.split(':');
-    r.format = s[0];
-    r.pattern = s[1];
-  }
-  return r;
-}
-
 class Schema {
   constructor (opts) {
     opts = opts || {};
     deepExtend(this, opts);
   }
 
-  generate (schema) {
-    const castMap = {};
-    schema.fields.forEach(field => {
-      const fn = this.generateCastFn(field);
-      if (fn) {
-        castMap[field.name] = fn;
-      }
-    });
-    return castMap;
+  normalizeField (field) {
+    const type = field.type || 'string';
+
+    field = Object.assign({
+      type,
+      format: 'default',
+      missingValues: type === 'string' ? undefined : [''],
+      pattern: null,
+      constraints: {}
+    }, field);
+
+    field.missingValues = Array.isArray(field.missingValues) ? field.missingValues : [field.missingValues];
+    field.title = field.title || readableName(field.name);
+
+    if (field.format.indexOf(':') !== -1) {
+      const s = field.format.split(':');
+      field.format = s[0];
+      field.pattern = s[1];
+    }
+
+    field.$fn = field.$fn || this.generateCastFn(field);
+    return field;
+  }
+
+  normalizeSchema (schema) {
+    schema = Object.assign({
+      fields: []
+    }, schema);
+    schema.fields = schema.fields.map(f => this.normalizeField(f));
+    return schema;
   }
 
   generateCastFn (field) {
-    field = normalizeField(field);
     if (!field.type || !Object.prototype.hasOwnProperty.call(this.types, field.type)) {
       return null;
     }
@@ -65,21 +70,77 @@ class Schema {
   }
 
   process (resource) {
+    const self = this;
+
+    resource = Object.assign({}, resource);
     /* istanbul ignore if */
-    if (!Array.isArray(resource.data)) {
-      return {data: resource.data};
+    if (!Array.isArray(resource.data) || !resource.schema || !resource.schema.fields || resource.schema.fields.length === 0) {
+      return resource;
     }
 
-    const castMap = resource.schema.$castMap || (resource.schema.$castMap = this.generate(resource.schema));
+    resource.errors = resource.errors || [];
+    const fields = resource.schema.fields;
 
-    return {data: resource.data.map(d => {
-      const r = {};
-      for (const key in d) { /* eslint guard-for-in: 0 */
-        r[key] = (key in castMap) ? castMap[key](d[key]) : d[key];
-      }
-      return r;
-    })};
+    resource.data = resource.data.map((d, i) => {
+      d = Object.assign({}, d);
+      fields.forEach(field => {
+        const key = field.name;
+        if (Object.prototype.hasOwnProperty.call(d, key)) {
+          const $fn = field.$fn || (field.$fn = self.generateCastFn(field));
+          try {
+            d[key] = $fn(d[key]);
+          } catch (err) {
+            resource.errors.push({
+              type: 'FieldMismatch',
+              code: 'InvalidType',
+              message: err.message,
+              row: i
+            });
+          }
+        } else if (field.constraints && field.constraints.required) {
+          resource.errors.push({
+            type: 'ConstraintsError',
+            code: 'MissingField',
+            message: `Missing field: the field "${key}" requires a value`,
+            row: i
+          });
+        }
+      });
+
+      return d;
+    });
+
+    return resource;
   }
+}
+
+function readableName (columnName) {
+  // adapted from readableColumnName: https://github.com/angular-ui/ui-grid/blob/master/src/js/core/services/ui-grid-util.js
+  if (typeof columnName === 'undefined' || columnName === undefined || columnName === null) {
+    return columnName;
+  }
+
+  if (typeof columnName !== 'string') {
+    columnName = String(columnName);
+  }
+
+  columnName = columnName.split('.').pop();
+
+  return columnName
+    // Convert underscores to spaces
+    .replace(/_+/g, ' ')
+    // Replace a completely all-capsed word with a first-letter-capitalized version
+    .replace(/^[A-Z]+$/, match => {
+      return (match.charAt(0).toUpperCase() + match.slice(1)).toLowerCase();
+    })
+    // Capitalize the first letter of words
+    .replace(/([\w\u00C0-\u017F]+)/g, match => {
+      return match.charAt(0).toUpperCase() + match.slice(1);
+    })
+    // Put a space in between words that have partial capilizations (i.e. 'firstName' becomes 'First Name')
+    // .replace(/([A-Z]|[A-Z]\w+)([A-Z])/g, "$1 $2");
+    // .replace(/(\w+?|\w)([A-Z])/g, "$1 $2");
+    .replace(/(\w+?(?=[A-Z]))/g, '$1 ');
 }
 
 module.exports = Schema;

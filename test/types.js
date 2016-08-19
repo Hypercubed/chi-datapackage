@@ -8,8 +8,13 @@ const schemaProcessor = new SchemaProcessor({types});
 
 const utc = (...args) => new Date(Date.UTC(...args));
 
+function castFn (field) {
+  field = schemaProcessor.normalizeField(field);
+  return field.$fn;
+}
+
 test('string', t => {
-  const fn = schemaProcessor.generateCastFn({type: 'string'});
+  const fn = castFn({type: 'string'});
   t.is(fn(1.9), '1.9');
   t.is(fn(true), 'true');
   t.is(fn(false), 'false');
@@ -19,7 +24,7 @@ test('string', t => {
 });
 
 test('number', t => {
-  const fn = schemaProcessor.generateCastFn({type: 'number'});
+  const fn = castFn({type: 'number'});
   t.is(fn('1'), 1);
   t.is(fn('1.2'), 1.2);
   t.is(fn('1.2e3'), 1.2e3);
@@ -35,7 +40,7 @@ test('number', t => {
 });
 
 test('integer', t => {
-  const fn = schemaProcessor.generateCastFn({type: 'integer'});
+  const fn = castFn({type: 'integer'});
   t.is(fn('1'), 1);
   t.is(fn(1), 1);
   t.true(Number.isNaN(fn('NaN')));
@@ -50,7 +55,7 @@ test('integer', t => {
 });
 
 test('integer, missing values', t => {
-  const fn = schemaProcessor.generateCastFn({
+  const fn = castFn({
     type: 'integer',
     missingValues: '-'
   });
@@ -60,7 +65,7 @@ test('integer, missing values', t => {
 });
 
 test('integer, two missing values', t => {
-  const fn = schemaProcessor.generateCastFn({
+  const fn = castFn({
     type: 'integer',
     missingValues: ['', '-']
   });
@@ -71,7 +76,7 @@ test('integer, two missing values', t => {
 });
 
 test('datetime', t => {
-  const fn = schemaProcessor.generateCastFn({type: 'datetime'});
+  const fn = castFn({type: 'datetime'});
   t.deepEqual(fn('1990-01-01T00:00:00Z'), utc(1990, 0, 1, 0, 0, 0));
   t.deepEqual(fn('2011-12-31T23:59:59Z'), utc(2011, 11, 31, 23, 59, 59));
 
@@ -81,7 +86,7 @@ test('datetime', t => {
 });
 
 test('date', t => {
-  const fn = schemaProcessor.generateCastFn({type: 'date'});
+  const fn = castFn({type: 'date'});
   t.deepEqual(fn('1990-01-01'), utc(1990, 0, 1));
   t.deepEqual(fn('2011-12-31'), utc(2011, 11, 31));
 
@@ -91,7 +96,7 @@ test('date', t => {
 });
 
 test('date, any', t => {
-  const fn = schemaProcessor.generateCastFn({
+  const fn = castFn({
     type: 'date',
     format: 'any'
   });
@@ -104,7 +109,7 @@ test('date, any', t => {
 });
 
 test('date, fmt', t => {
-  const fn = schemaProcessor.generateCastFn({
+  const fn = castFn({
     type: 'date',
     format: 'fmt:%Y'
   });
@@ -116,7 +121,7 @@ test('date, fmt', t => {
 });
 
 test('time', t => {
-  const fn = schemaProcessor.generateCastFn({type: 'time'});
+  const fn = castFn({type: 'time'});
   t.deepEqual(fn('09:00:00'), utc(1900, 0, 1, 9, 0, 0));
   t.deepEqual(fn('18:00:00'), utc(1900, 0, 1, 18, 0, 0));
 
@@ -126,7 +131,7 @@ test('time', t => {
 });
 
 test('duration', t => {
-  const fn = schemaProcessor.generateCastFn({type: 'duration'});
+  const fn = castFn({type: 'duration'});
   t.is(fn('PT8S'), 8 * 1000);
   t.is(fn('PT10M'), 10 * 60 * 1000);
   t.is(fn('PT20H'), 20 * 60 * 60 * 1000);
@@ -138,7 +143,7 @@ test('duration', t => {
 });
 
 test('boolean', t => {
-  const fn = schemaProcessor.generateCastFn({type: 'boolean'});
+  const fn = castFn({type: 'boolean'});
   t.is(fn(true), true);
   t.is(fn(false), false);
   t.is(fn('true'), true);
@@ -160,7 +165,7 @@ test('boolean', t => {
 });
 
 test('object', t => {
-  const fn = schemaProcessor.generateCastFn({type: 'object'});
+  const fn = castFn({type: 'object'});
   t.deepEqual(fn('{}'), {});
   t.deepEqual(fn('{"foo": "bar", "baz": true, "buzz": 10}'), {foo: 'bar', baz: true, buzz: 10});
   t.deepEqual(fn('{foo: "bar", baz: true, "buzz": 10}'), {foo: 'bar', baz: true, buzz: 10});
@@ -173,7 +178,7 @@ test('object', t => {
 });
 
 test('array', t => {
-  const fn = schemaProcessor.generateCastFn({type: 'array'});
+  const fn = castFn({type: 'array'});
   t.deepEqual(fn('[]'), []);
   t.deepEqual(fn('[1,2,3]'), [1, 2, 3]);
 

@@ -3,10 +3,16 @@
   "resources": [
     {
       "format": "txt",
+      "content": "hello\n",
       "data": "hello"
     },
     {
+      "format": "csv",
       "data": [{"A": "1", "B": "2", "C": "3"}, {"A": "4", "B": "5", "C": "6"}]
+    },
+    {
+      "format": "tsv",
+      "content": "A\tB\tC\n1\t2\t3\n4\t5\t6"
     },
     {
       "format": "matrix",

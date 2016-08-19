@@ -3,13 +3,13 @@ const parseIsoDuration = require('parse-iso-duration');
 
 const parse = require('json5').parse;
 
-const INVALID_TYPE = 'chi-datapackage: Invalid type';
+const INVALID_TYPE = 'Invalid type';
 
 function jsonParse (isArray) {
   return function (d) {
     const c = parse(d);
     if (Array.isArray(c) !== isArray) {
-      throw new Error(INVALID_TYPE);
+      throw new Error(`${INVALID_TYPE}: expected JSON Array`);
     }
     return c;
   };
@@ -20,7 +20,7 @@ function utcParse (fmt) {
   return function (d) {
     const c = fn(d);
     if (Number.isNaN(c) || c === null) {
-      throw new Error(INVALID_TYPE);
+      throw new Error(`${INVALID_TYPE}: expected ${fmt} formmated date`);
     }
     return c;
   };
@@ -29,7 +29,7 @@ function utcParse (fmt) {
 function dateParse (d) {
   const c = new Date(d);
   if (isNaN(c.getTime())) {
-    throw new Error(INVALID_TYPE);
+    throw new Error(`${INVALID_TYPE}: expected formmated date`);
   }
   return c;
 }
@@ -46,7 +46,7 @@ const checkSpecialNumbers = fn => d => {
   }
   const c = fn(d);
   if (Number.isNaN(c)) {
-    throw new Error(INVALID_TYPE);
+    throw new Error(`${INVALID_TYPE}: expected numeric value`);
   }
   return c;
 };
@@ -62,7 +62,7 @@ function castInt (value) {
   if (/^(\-|\+)?([0-9]+|Infinity)$/.test(String(value))) {
     return castNumber(value);
   }
-  throw new Error(INVALID_TYPE);
+  throw new Error(`${INVALID_TYPE}: expected integer value`);
 }
 
 const TRUE_VALUES = ['yes', 'y', 'true', 't', '1'];
@@ -78,7 +78,7 @@ function castBoolean (value) {
   if (FALSE_VALUES.indexOf(String(value).toLowerCase()) !== -1) {
     return false;
   }
-  throw new Error(INVALID_TYPE);
+  throw new Error(`${INVALID_TYPE}: expected boolean value`);
 }
 
 const typeToCast = {

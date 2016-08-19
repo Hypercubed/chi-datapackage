@@ -3,8 +3,8 @@
 _\( managed using [todo-md](https://github.com/Hypercubed/todo-md) \)_
 
 - [x] Normalizer
-  - [ ] Assign name if none found
-  - [ ] Normalize schemas
+  - [x] Assign name if none found
+  - [x] Normalize schemas
   - [ ] Handle URL schemas
   - [x] Test datapackage loaded from url
   - [ ] only one of url, path, data present in resource
@@ -14,7 +14,9 @@ _\( managed using [todo-md](https://github.com/Hypercubed/todo-md) \)_
 - [x] Schema processor
   - [x] Test each cast
   - [x] Support type formats
-  - [ ] Field Constraints?
+  - [ ] More field constraints
+  - [x] Test constraints
+  - [ ] Validate schema (see https://github.com/frictionlessdata/jsontableschema-js/blob/master/src/validate.js)
 - [x] Loader
   - [x] Test URL fetch
   - [x] Test github fetch

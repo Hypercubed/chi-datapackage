@@ -8,8 +8,8 @@ const identifier = require('datapackage-identifier');
 const absURLRegEx = /^([^\/]+:\/\/|\/)/;
 
 const resolvePath = (() => {
+  /* istanbul ignore next , in browser*/
   if (typeof document !== 'undefined') {
-    // in browser
     return function resolve (url) {
       const div = document.createElement('div');
       div.innerHTML = '<a></a>';
@@ -21,18 +21,6 @@ const resolvePath = (() => {
   return require('path').resolve;
 })();
 
-function normalizeDataPackageUrl (datapackage) {
-  if (typeof datapackage === 'string') {
-    datapackage = {url: datapackage};
-  }
-  if (!datapackage.dataPackageJsonUrl) {
-    let url = datapackage.path || datapackage.url;
-    url = url.match(absURLRegEx) ? url : resolvePath(url);
-    datapackage = Object.assign(datapackage, identifier.parse(url));
-  }
-  return datapackage;
-}
-
 class Loader {
   constructor (opts) {
     this.fetch = opts.fetch;
@@ -40,28 +28,33 @@ class Loader {
 
   datapackage (datapackage) {
     debug('Loading datapackage', datapackage);
-    datapackage = normalizeDataPackageUrl(datapackage);
-    const dataPackageJsonUrl = datapackage.dataPackageJsonUrl;
+    if (typeof datapackage === 'string') {
+      datapackage = {path: datapackage};
+    }
+    const id = getIdentifier(datapackage);
+    const url = id.dataPackageJsonUrl;
+    id.base = id.url;
+
     return this
-      .fetch(dataPackageJsonUrl)
+      .fetch(url)
       .catch(err => {
         if (err.code === 'ENOENT') {
-          throw new Error(`No DataPackage at path '${dataPackageJsonUrl}'`);
+          throw new Error(`No DataPackage at path '${url}'`);
         }
         /* istanbul ignore next */
         throw err;
       })
       .then(parse)
-      .then(res => Object.assign(datapackage, res, datapackage));
+      .then(res => Object.assign(res, datapackage, id));
   }
 
-  resources (datapackage) {
+  resources (resources) {
     return Promise
-      .all(datapackage.resources.map(r => this.resource(r)))
-      .then(() => datapackage);
+      .all(resources.map(r => this.resource(r)));
   }
 
   resource (resource) {
+    resource = Object.assign({}, resource);
     debug('Loading resource', resource);
     if (!resource.url) {
       return Promise.resolve(resource);
@@ -81,5 +74,39 @@ class Loader {
       });
   }
 }
+
+Loader.id = getIdentifier;
+
+function getIdentifier (datapackage) {
+  let url = datapackage.path || datapackage.url;
+  url = url.match(absURLRegEx) ? url : resolvePath(url);
+  return identifier.parse(url);
+}
+
+/* function getDataPackageJsonUrl (datapackage) {
+  let url = '';
+  if (datapackage.dataPackageJsonUrl) {
+    return datapackage.dataPackageJsonUrl;
+  }
+  if (typeof datapackage === 'string') {
+    url = datapackage;
+  } else {
+    url = datapackage.path || datapackage.url;
+  }
+  url = url.match(absURLRegEx) ? url : resolvePath(url);
+  return identifier.parse(url).dataPackageJsonUrl;
+}
+
+function normalizeDataPackageUrl (datapackage) {
+  if (typeof datapackage === 'string') {
+    datapackage = {url: datapackage};
+  }
+  if (!datapackage.dataPackageJsonUrl) {
+    let url = datapackage.path || datapackage.url;
+    url = url.match(absURLRegEx) ? url : resolvePath(url);
+    datapackage = Object.assign(datapackage, identifier.parse(url));
+  }
+  return datapackage;
+} */
 
 module.exports = Loader;

@@ -2,6 +2,7 @@
 
 const urijs = require('urijs');
 const deepExtend = require('deep-extend');
+const cuid = require('cuid');
 
 class Normalizer {
   constructor (opts) {
@@ -21,40 +22,32 @@ class Normalizer {
       name: dir,
       resources: [],
       homepage: base,
-      description: ''
+      description: '',
+      schemas: {}
     }, datapackage);
 
     ['image', 'readme'].forEach(key => {
-      if ({}.hasOwnProperty.call(normalized, key)) {
+      if (Object.prototype.hasOwnProperty.call(normalized, key)) {
         normalized[key] = urijs(normalized[key], base).href();
       }
     });
 
-    if (normalized.schemas) {
-      const schemas = normalized.schemas;
-      for (const key in schemas) {
-        if ({}.hasOwnProperty.call(schemas, key)) {
-          schemas[key].key = schemas[key].key || key;
-        }
-      }
-    }
-
     return normalized;
   }
 
-  // TODO: 1.0.0-beta.15: only one of url, path, data present
-  resources (datapackage) {
-    if (datapackage.resources) {
-      datapackage.resources = datapackage.resources.map(resource => this.resource(datapackage, resource));
+  /* resources (datapackage) {
+    if (!Array.isArray(datapackage.resources)) {
+      return [];
     }
-    Normalizer.index(datapackage);
-    return datapackage;
-  }
+    return datapackage.resources.map(resource => this.resource(datapackage, resource));
+  } */
 
   resource (datapackage, resource) {
     if (typeof resource === 'string') {
       resource = {path: resource};
     }
+
+    resource = deepExtend({}, resource);
 
     if (resource.path || resource.url) {
       const uri = urijs(resource.path || resource.url);
@@ -65,6 +58,8 @@ class Normalizer {
       resource.url = resource.url || uri.absoluteTo(datapackage.url).href();
     }
 
+    resource.name = resource.name || cuid();
+
     if (!resource.format && !resource.content && resource.data) {
       resource.format = 'json';
     }
@@ -73,22 +68,30 @@ class Normalizer {
       resource.mediatype = resource.mediatype || this.mime.lookup(resource.format);
     }
 
-    if (resource.schema && typeof resource.schema === 'string') {
-      resource.schema = datapackage.schemas[resource.schema]; // TODO: check for URLS, catch missing schemas
-    }
+    /* if (resource.schema) {
+      if (typeof resource.schema === 'string') {
+        resource.schema = datapackage.schemas[resource.schema]; // TODO: check for URLS, catch missing schemas
+      } else {
+        // maybe bad, datapackage should be immutable here
+        datapackage.schemas = datapackage.schemas || {};
+        datapackage.schemas[`@@${resource.name}:schema`] = resource.schema;
+      }
+    } */
 
     return resource;
   }
 }
 
-Normalizer.index = function index (datapackage) {
-  datapackage.$resourcesByName = {};
+function getResourceIndex (datapackage) {
+  const $resourcesByName = {};
   datapackage.resources.forEach(r => {
     if (r.name) {
-      datapackage.$resourcesByName[r.name] = r;
+      $resourcesByName[r.name] = r;
     }
   });
-  return datapackage;
-};
+  return $resourcesByName;
+}
+
+Normalizer.index = getResourceIndex;
 
 module.exports = Normalizer;
