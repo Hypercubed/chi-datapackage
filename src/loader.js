@@ -22,7 +22,9 @@ const resolvePath = (() => {
   const path = require('path');
 
   return url => {
-    url = path.resolve(url).replace(/\\/g, '/');
+    url = path
+      .resolve(url)  // ensures path is absolute
+      .replace(/\\/g, '/');  // ensures path is POSIX, ready to be a url
     return (url[0] === '/') ? url : `/${url}`;
   };
 })();
