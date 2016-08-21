@@ -1,6 +1,7 @@
 'use strict';
 
 const debug = require('debug')('Loader');
+
 const parse = require('json5').parse;
 
 const identifier = require('datapackage-identifier');
@@ -18,7 +19,12 @@ const resolvePath = (() => {
       return div.firstChild.href;
     };
   }
-  return require('path').resolve;
+  const path = require('path');
+
+  return url => {
+    url = path.resolve(url).replace(/\\/g, '/');
+    return (url[0] === '/') ? url : `/${url}`;
+  };
 })();
 
 class Loader {

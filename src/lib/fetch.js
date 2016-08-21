@@ -1,10 +1,17 @@
 require('isomorphic-fetch');
 
+const path = require('path');
 const readFile = require('fs').readFile;
 
+const debug = require('debug')('fetch');
+
 function fetchTextFromURL (url) {
+  debug('fecthing', url);
   if (url.indexOf('file://') === 0) {
     url = url.replace('file://', '');
+    if (path.sep === '\\') {
+      url = path.normalize(url).replace(/^\\/, '');
+    }
     return new Promise((resolve, reject) => {
       readFile(url, 'utf8', (err, res) => {
         if (err) {
@@ -23,7 +30,5 @@ function fetchTextFromURL (url) {
       return response.text();
     });
 }
-
-// TODO: Browser
 
 module.exports = fetchTextFromURL;
