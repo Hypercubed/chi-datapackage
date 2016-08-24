@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* Ensure paths are always POSIX
+_(none)_
 
 --------------------
+
+## 3.0.1 (2016-08-24)
+* Ensure paths are always POSIX
 
 ## 3.0.0 (2016-08-19)
 * Assign cuid to resources without name
