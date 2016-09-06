@@ -63,6 +63,9 @@ class Schema {
         resource.schema = pointers.isPointer(schema) ?
           pointers.get(datapackage, schema) :
           schemas[schema];
+        if (typeof resource.schema === 'undefined') {
+          throw new Error(`Missing or invalid schema: "${schema}"`);
+        }
       } else {
         schemas[`@@${resource.name}:schema`] = schema;
       }
