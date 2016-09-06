@@ -35,13 +35,6 @@ class Normalizer {
     return normalized;
   }
 
-  /* resources (datapackage) {
-    if (!Array.isArray(datapackage.resources)) {
-      return [];
-    }
-    return datapackage.resources.map(resource => this.resource(datapackage, resource));
-  } */
-
   resource (datapackage, resource) {
     if (typeof resource === 'string') {
       resource = {path: resource};
@@ -67,16 +60,6 @@ class Normalizer {
     if (resource.format) {
       resource.mediatype = resource.mediatype || this.mime.lookup(resource.format);
     }
-
-    /* if (resource.schema) {
-      if (typeof resource.schema === 'string') {
-        resource.schema = datapackage.schemas[resource.schema]; // TODO: check for URLS, catch missing schemas
-      } else {
-        // maybe bad, datapackage should be immutable here
-        datapackage.schemas = datapackage.schemas || {};
-        datapackage.schemas[`@@${resource.name}:schema`] = resource.schema;
-      }
-    } */
 
     return resource;
   }

@@ -3,10 +3,14 @@
 const debug = require('debug')('Loader');
 
 const parse = require('json5').parse;
+// const url = require('url');
 
 const identifier = require('datapackage-identifier');
 
 const absURLRegEx = /^([^\/]+:\/\/|\/)/;
+// const forwardSlashPattern = /\//g;
+const backSlashPattern = /\\/g;
+// const protocolPattern = /^([a-z0-9.+-]+):\/\//i;
 
 const resolvePath = (() => {
   /* istanbul ignore next , in browser*/
@@ -24,7 +28,7 @@ const resolvePath = (() => {
   return url => {
     url = path
       .resolve(url)  // ensures path is absolute
-      .replace(/\\/g, '/');  // ensures path is POSIX, ready to be a url
+      .replace(backSlashPattern, '/');  // ensures path is POSIX, ready to be a url
     return (url[0] === '/') ? url : `/${url}`;
   };
 })();
@@ -87,34 +91,9 @@ Loader.id = getIdentifier;
 
 function getIdentifier (datapackage) {
   let url = datapackage.path || datapackage.url;
+  url = url.replace(backSlashPattern, '/');
   url = url.match(absURLRegEx) ? url : resolvePath(url);
   return identifier.parse(url);
 }
-
-/* function getDataPackageJsonUrl (datapackage) {
-  let url = '';
-  if (datapackage.dataPackageJsonUrl) {
-    return datapackage.dataPackageJsonUrl;
-  }
-  if (typeof datapackage === 'string') {
-    url = datapackage;
-  } else {
-    url = datapackage.path || datapackage.url;
-  }
-  url = url.match(absURLRegEx) ? url : resolvePath(url);
-  return identifier.parse(url).dataPackageJsonUrl;
-}
-
-function normalizeDataPackageUrl (datapackage) {
-  if (typeof datapackage === 'string') {
-    datapackage = {url: datapackage};
-  }
-  if (!datapackage.dataPackageJsonUrl) {
-    let url = datapackage.path || datapackage.url;
-    url = url.match(absURLRegEx) ? url : resolvePath(url);
-    datapackage = Object.assign(datapackage, identifier.parse(url));
-  }
-  return datapackage;
-} */
 
 module.exports = Loader;
