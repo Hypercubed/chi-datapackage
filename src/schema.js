@@ -1,6 +1,7 @@
 'use strict';
 
 const deepExtend = require('deep-extend');
+const pointers = require('./lib/pointers');
 
 // Note: some code based on https://github.com/frictionlessdata/datapackage-render-js/blob/master/datapackage.js
 // MIT Open Knowledge Labs <labs@okfn.org>
@@ -52,6 +53,20 @@ class Schema {
     }, schema);
     schema.fields = schema.fields.map(f => this.normalizeField(f));
     return schema;
+  }
+
+  normalizeResource (datapackage, resource) {
+    const schemas = datapackage.schemas;
+    const schema = resource.schema;
+    if (schema) {
+      if (typeof schema === 'string') {  // TODO: check for URLS, catch missing schemas
+        resource.schema = pointers.isPointer(schema) ?
+          pointers.get(datapackage, schema) :
+          schemas[schema];
+      } else {
+        schemas[`@@${resource.name}:schema`] = schema;
+      }
+    }
   }
 
   generateCastFn (field) {

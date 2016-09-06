@@ -37,17 +37,7 @@ class DataPackageService {
   }
 
   normalizeSchemas (p) {
-    const schemas = p.schemas;
-
-    p.resources.forEach(r => {
-      if (r.schema) {
-        if (typeof r.schema === 'string') {
-          r.schema = schemas[r.schema]; // TODO: check for URLS, catch missing schemas
-        } else {
-          schemas[`@@${r.name}:schema`] = r.schema;
-        }
-      }
-    });
+    p.resources.forEach(r => this.schemaProcessor.normalizeResource(p, r));
 
     for (const key in p.schemas) {
       if (Object.prototype.hasOwnProperty.call(p.schemas, key)) {

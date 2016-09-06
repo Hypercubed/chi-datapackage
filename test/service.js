@@ -40,9 +40,9 @@ async function setupHttp () {
     .reply(200, csv);
 }
 
-['fixtures/inline/', {path: 'fixtures/loaded/'}].forEach(p => {
+['fixtures/inline/', 'fixtures/pointers/', {path: 'fixtures/loaded/'}].forEach(p => {
   test(`process content - from ${p}`, async t => {
-    p = await dp.load('fixtures/inline/');
+    p = await dp.load(p);
 
     t.deepEqual(p.resources[0].data, 'hello\n');
     t.deepEqual(p.resources[1].data, json);
