@@ -1,5 +1,6 @@
 'use strict';
 
+const assert = require('assert');
 const debug = require('debug')('Loader');
 
 const parse = require('json5').parse;
@@ -35,6 +36,7 @@ const resolvePath = (() => {
 
 class Loader {
   constructor (opts) {
+    assert(opts && typeof opts.fetch === 'function', 'opts.fetch is required.');
     this.fetch = opts.fetch;
   }
 

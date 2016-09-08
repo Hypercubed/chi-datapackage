@@ -1,12 +1,13 @@
 'use strict';
 
+const assert = require('assert');
 const urijs = require('urijs');
 const deepExtend = require('deep-extend');
 const cuid = require('cuid');
 
 class Normalizer {
   constructor (opts) {
-    opts = opts || {};
+    assert(opts && typeof opts.mimeLookup === 'object', 'opts.mimeLookup is required.');
     this.mime = opts.mimeLookup;
   }
 

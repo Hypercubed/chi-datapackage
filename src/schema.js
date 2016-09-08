@@ -1,5 +1,6 @@
 'use strict';
 
+const assert = require('assert');
 const deepExtend = require('deep-extend');
 const pointers = require('./lib/pointers');
 
@@ -19,8 +20,8 @@ function nullCheck (mv, fn) {
 
 class Schema {
   constructor (opts) {
-    opts = opts || {};
-    deepExtend(this, opts);
+    assert(opts && typeof opts.types === 'object', 'opts.types is required.');
+    this.types = deepExtend({}, opts.types);
   }
 
   normalizeField (field) {

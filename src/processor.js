@@ -1,10 +1,12 @@
 'use strict';
 
+const assert = require('assert');
 const deepExtend = require('deep-extend');
 
 class Processor {
   constructor (opts) {
-    opts = opts || {};
+    assert(opts && typeof opts.translators === 'object', 'opts.translators is required.');
+    assert(opts && typeof opts.schemaProcessor === 'object', 'opts.schemaProcessor is required.');
     this.translators = deepExtend({}, opts.translators);
     this.schemaProcessor = opts.schemaProcessor;
   }
