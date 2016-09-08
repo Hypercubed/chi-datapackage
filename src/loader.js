@@ -1,5 +1,6 @@
 'use strict';
 
+const path = require('path');
 const assert = require('assert');
 const debug = require('debug')('Loader');
 
@@ -24,7 +25,6 @@ const resolvePath = (() => {
       return div.firstChild.href;
     };
   }
-  const path = require('path');
 
   return url => {
     url = path
@@ -34,10 +34,22 @@ const resolvePath = (() => {
   };
 })();
 
+function isFilePath (url) {
+  return (!process.browser && url.indexOf('file://') === 0);
+}
+
 class Loader {
   constructor (opts) {
     assert(opts && typeof opts.fetch === 'function', 'opts.fetch is required.');
     this.fetch = opts.fetch;
+    this.read = opts.read;
+  }
+
+  load (pathOrUrl) {
+    if (isFilePath(pathOrUrl)) {
+      return this.read(pathOrUrl.replace('file://', ''));
+    }
+    return this.fetch(pathOrUrl);
   }
 
   datapackage (datapackage) {
@@ -49,8 +61,11 @@ class Loader {
     const url = id.dataPackageJsonUrl;
     id.base = id.url;
 
-    return this
-      .fetch(url)
+    if (!url) {
+      return Promise.resolve(datapackage);
+    }
+
+    return this.load(url)
       .catch(err => {
         if (err.code === 'ENOENT') {
           throw new Error(`No DataPackage at path '${url}'`);
@@ -70,14 +85,16 @@ class Loader {
   resource (resource) {
     resource = Object.assign({}, resource);
     debug('Loading resource', resource);
-    if (!resource.url) {
+
+    const url = resource.url;
+    if (!url) {
       return Promise.resolve(resource);
     }
-    return this
-      .fetch(resource.url)
+
+    return this.load(url)
       .catch(err => {
         if (err.code === 'ENOENT') {
-          throw new Error(`No DataPackage resource at path '${resource.url}'`);
+          throw new Error(`No DataPackage resource at path '${url}'`);
         }
         /* istanbul ignore next */
         throw err;

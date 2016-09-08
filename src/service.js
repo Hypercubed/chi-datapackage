@@ -10,7 +10,8 @@ const Loader = require('./loader');
 const mimeDb = require('./lib/mime.json');
 const translators = require('./lib/translators');
 const types = require('./lib/types');
-const fetch = require('./lib/fetch');
+
+const load = require('./lib/load');
 
 class DataPackageService {
   constructor () {
@@ -19,7 +20,7 @@ class DataPackageService {
     this.schemaProcessor = new SchemaProcessor({types});
     this.normalize = new Normalizer({mimeLookup});
     this.processor = new Processor({translators, schemaProcessor: this.schemaProcessor});
-    this.loader = new Loader({fetch});
+    this.loader = new Loader(load);
   }
 
   normalizePackage (p) {

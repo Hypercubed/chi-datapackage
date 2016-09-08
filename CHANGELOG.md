@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* read and fetch as seperate options for Loader
 
 --------------------
 
