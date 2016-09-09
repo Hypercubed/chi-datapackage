@@ -50,6 +50,7 @@ test('process resource with missing values', async t => {
   const pr = dp.processor.resource(r);
 
   t.not(pr, r, 'creates a new object');
+  t.deepEqual(pr.data.length, json.length);
   t.deepEqual(pr.data, json);
 });
 

@@ -3,11 +3,10 @@
 const path = require('path');
 const assert = require('assert');
 const debug = require('debug')('Loader');
-
-const parse = require('json5').parse;
-// const url = require('url');
-
 const identifier = require('datapackage-identifier');
+
+const JSON5 = require('json5');
+// const url = require('url');
 
 const absURLRegEx = /^([^\/]+:\/\/|\/)/;
 // const forwardSlashPattern = /\//g;
@@ -73,7 +72,7 @@ class Loader {
         /* istanbul ignore next */
         throw err;
       })
-      .then(parse)
+      .then(JSON5.parse)
       .then(res => Object.assign(res, datapackage, id));
   }
 

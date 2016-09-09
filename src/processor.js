@@ -18,17 +18,23 @@ class Processor {
   }
 
   resource (resource) {
-    const r = Object.assign({}, resource);
-    if (r.content) {
-      const translator = this.translators[r.mediatype];
-      if (translator) {
-        Object.assign(r, translator(r));
+    const mediatype = resource.mediatype;
+    const result = Object.assign({}, resource, {
+      $error: null,
+      errors: []
+    });
+
+    if (resource.content && mediatype) {
+      if (!Object.prototype.hasOwnProperty.call(this.translators, mediatype)) {
+        throw new Error(`Unknown media type ${resource.mediatype}`);
       }
+      const translator = this.translators[mediatype];
+      Object.assign(result, translator(result));
     }
-    if (r.schema) {
-      return Object.assign(r, this.schemaProcessor.process(r));
+    if (resource.schema) {
+      Object.assign(result, this.schemaProcessor.process(result));
     }
-    return r;
+    return result;
   }
 }
 

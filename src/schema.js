@@ -91,25 +91,27 @@ class Schema {
   process (resource) {
     const self = this;
 
-    resource = Object.assign({}, resource);
     /* istanbul ignore if */
     if (!Array.isArray(resource.data) || !resource.schema || !resource.schema.fields || resource.schema.fields.length === 0) {
       return resource;
     }
 
-    resource.errors = resource.errors || [];
+    let resourceErrors = resource.errors || [];
     const fields = resource.schema.fields;
 
-    resource.data = resource.data.map((d, i) => {
-      d = Object.assign({}, d);
+    const processedData = [];
+
+    resource.data.forEach((d, i) => {
+      const r = deepExtend({}, d);
+      const errors = [];
       fields.forEach(field => {
         const key = field.name;
-        if (Object.prototype.hasOwnProperty.call(d, key)) {
+        if (Object.prototype.hasOwnProperty.call(r, key)) {
           const $fn = field.$fn || (field.$fn = self.generateCastFn(field));
           try {
-            d[key] = $fn(d[key]);
+            r[key] = $fn(r[key]);
           } catch (err) {
-            resource.errors.push({
+            errors.push({
               type: 'FieldMismatch',
               code: 'InvalidType',
               message: err.message,
@@ -117,7 +119,7 @@ class Schema {
             });
           }
         } else if (field.constraints && field.constraints.required) {
-          resource.errors.push({
+          errors.push({
             type: 'ConstraintsError',
             code: 'MissingField',
             message: `Missing field: the field "${key}" requires a value`,
@@ -126,10 +128,17 @@ class Schema {
         }
       });
 
-      return d;
+      if (errors.length === 0) {
+        processedData.push(r);
+      } else {
+        resourceErrors = resourceErrors.concat(errors);
+      }
     });
 
-    return resource;
+    return Object.assign({}, resource, {
+      errors: resourceErrors,
+      data: processedData
+    });
   }
 }
 

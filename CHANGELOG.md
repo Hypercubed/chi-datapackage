@@ -3,6 +3,8 @@ CHANGELOG
 
 ## HEAD (Unreleased)
 * read and fetch as seperate options for Loader
+* Add seperate JSON and JSON5 types
+* Improved error handling
 
 --------------------
 

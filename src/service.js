@@ -63,15 +63,28 @@ class DataPackageService {
   }
 
   processResource (r) {
+    r.$error = undefined;  // last error
+    r.errors = [];         // list of all errors
     try {
-      return Object.assign(r, this.processor.resource(r));
+      Object.assign(r, this.processor.resource(r));
+      if (r.errors && r.errors.length > 0) {
+        console.log('asdfasdfsdf');
+        r.$error = new Error(`Errors processing resource ${r.name}`);
+      }
     } catch (err) {
-      return Object.assign(r, {$valid: false, $error: err});
+      r.$error = err;
+      r.errors = r.errors || [];
+      r.errors.shift({
+        code: 'Parsing',
+        type: err.name,
+        message: `Parsing error: ${err.message}`
+      });
     }
+    return r;
   }
 
   processPackage (p) {
-    Object.assign(p, this.processor.datapackage(p));
+    p.resources = p.resources.map(r => this.processResource(r));
     p.$resourcesByName = Normalizer.index(p);
     return p;
   }

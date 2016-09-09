@@ -1,9 +1,21 @@
-const parse = require('json5').parse;
+const JSON5 = require('json5');
 
-module.exports = function fromJson (json) {
+module.exports.json5 = function (json) {
   if (typeof json === 'string' || /* istanbul ignore next */ json instanceof Buffer) {
     try {
-      json = parse(json);
+      json = JSON5.parse(json);
+    } catch (err) {
+      /* istanbul ignore next */
+      json = {};
+    }
+  }
+  return json;
+};
+
+module.exports.json = function (json) {
+  if (typeof json === 'string' || /* istanbul ignore next */ json instanceof Buffer) {
+    try {
+      json = JSON.parse(json);
     } catch (err) {
       /* istanbul ignore next */
       json = {};

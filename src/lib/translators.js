@@ -6,7 +6,7 @@ const setLineEnding = require('crlf-helper').setLineEnding;
 
 const dos2unix = content => setLineEnding(content, 'LF');
 
-const jsonParse = require('./json');
+const JSON5 = require('json5');
 const matrixParse = require('./matrix');
 
 module.exports = {
@@ -34,5 +34,7 @@ module.exports = {
 
   'text/matrix': resource => matrixParse(resource.content, resource.dialect),
 
-  'application/json': resource => ({data: jsonParse(resource.content)})
+  'application/json': resource => ({data: JSON.parse(resource.content)}),
+
+  'application/json5': resource => ({data: JSON5.parse(resource.content)})
 };
