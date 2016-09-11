@@ -78,6 +78,7 @@ test('normalize gdp datapackage', async t => {
 });
 
 test('normalize gdp datapackage - from url', async t => {
+  await setupHttp();
   const s = await dp.loader.datapackage('http://github.com/datasets/gdp');
   const p = dp.normalize.datapackage(s);
 
