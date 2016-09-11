@@ -7,11 +7,7 @@ import SchemaProcessor from '../src/schema';
 const schemaProcessor = new SchemaProcessor({types});
 
 const utc = (...args) => new Date(Date.UTC(...args));
-
-function castFn (field) {
-  field = schemaProcessor.normalizeField(field);
-  return field.$fn;
-}
+const castFn = (...args) => schemaProcessor.normalizeField(...args).$fn;
 
 test('string', t => {
   const fn = castFn({type: 'string'});

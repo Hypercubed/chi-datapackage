@@ -27,17 +27,15 @@ function readFilePromise (path) {
   });
 }
 
-async function setupHttp () {
-  const gdp = await readFilePromise('./fixtures/gdp/datapackage.json');
-  const csv = await readFilePromise('./fixtures/gdp/data/gdp.csv');
-
-  nock('http://raw.githubusercontent.com')
-    .get('/datasets/gdp/master/datapackage.json')
-    .reply(200, gdp);
-
-  nock('http://raw.githubusercontent.com')
-    .get('/datasets/gdp/master/data/gdp.csv')
-    .reply(200, csv);
+function setupHttp () {
+  const p = ['datapackage.json', 'data/gdp.csv'].map(p => {
+    return readFilePromise(`./fixtures/gdp/${p}`).then(res => {
+      nock('http://raw.githubusercontent.com')
+        .get(`/datasets/gdp/master/${p}`)
+        .reply(200, res);
+    });
+  });
+  return Promise.all(p);
 }
 
 ['fixtures/inline/', 'fixtures/pointers/', {path: 'fixtures/loaded/'}].forEach(p => {

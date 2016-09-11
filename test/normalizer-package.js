@@ -1,14 +1,32 @@
 /* eslint node/no-unsupported-features: 0 */
+import fs from 'fs';
+
 import test from 'ava';
 import nock from 'nock';
 
 import dp from '../';
 
-const gdp = require('./fixtures/gdp/datapackage.json');
+function readFilePromise (path) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(path, (error, content) => {
+      if (error) {
+        return reject(error);
+      }
+      resolve(content);
+    });
+  });
+}
 
-nock('http://raw.githubusercontent.com')
-  .get('/datasets/gdp/master/datapackage.json')
-  .reply(200, gdp);
+function setupHttp () {
+  const p = ['datapackage.json', 'data/gdp.csv'].map(p => {
+    return readFilePromise(`./fixtures/gdp/${p}`).then(res => {
+      nock('http://raw.githubusercontent.com')
+        .get(`/datasets/gdp/master/${p}`)
+        .reply(200, res);
+    });
+  });
+  return Promise.all(p);
+}
 
 test('normalize datapackage', async t => {
   const s = await dp.loadPackage('fixtures/bare/');
