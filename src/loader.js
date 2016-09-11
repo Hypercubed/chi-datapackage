@@ -110,7 +110,16 @@ Loader.id = getIdentifier;
 function getIdentifier (datapackage) {
   let url = datapackage.path || datapackage.url;
   url = url.replace(backSlashPattern, '/');
-  url = url.match(absURLRegEx) ? url : resolvePath(url);
+  if (url.match(absURLRegEx)) {
+    if (url.indexOf(/^file:\/\//) === 0) {
+      return {
+        url,
+        dataPackageJsonUrl: url
+      };
+    }
+  } else {
+    url = resolvePath(url);
+  }
   return identifier.parse(url);
 }
 
