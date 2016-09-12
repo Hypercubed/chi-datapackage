@@ -1,10 +1,8 @@
 /* eslint node/no-unsupported-features: 0 */
-import fs from 'fs';
-
 import test from 'ava';
-import nock from 'nock';
 
 import dp from '../';
+import setupHttp from './fixtures/http-mock';
 
 const json = [{A: '1', B: '2', C: '3'}, {A: '4', B: '5', C: '6'}];
 const jsonProcessed = [{A: '1', B: 2, C: 3}, {A: '4', B: 5, C: 6}];
@@ -14,29 +12,6 @@ const matrix = {
   rows: ['1', '4'],
   table: [['2', '3'], ['5', '6']]
 };
-
-function readFilePromise (path) {
-  return new Promise((resolve, reject) => {
-    fs.readFile(path, (error, content) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(content);
-      }
-    });
-  });
-}
-
-function setupHttp () {
-  const p = ['datapackage.json', 'data/gdp.csv'].map(p => {
-    return readFilePromise(`./fixtures/gdp/${p}`).then(res => {
-      nock('http://raw.githubusercontent.com')
-        .get(`/datasets/gdp/master/${p}`)
-        .reply(200, res);
-    });
-  });
-  return Promise.all(p);
-}
 
 ['fixtures/inline/', 'fixtures/pointers/', {path: 'fixtures/loaded/'}].forEach(p => {
   test(`process content - from ${p}`, async t => {

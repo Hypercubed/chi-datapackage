@@ -63,29 +63,6 @@ aString,anInteger,aDate
 10,11
 `;
 
-/*
-[ { type: 'FieldMismatch',
-    code: 'TooFewFields',
-    message: 'Too few fields: expected 3 fields but parsed 2',
-    row: 3 },
-  { type: 'FieldMismatch',
-    code: 'InvalidType',
-    message: 'Invalid type: expected integer value',
-    row: 0 },
-  { type: 'FieldMismatch',
-    code: 'InvalidType',
-    message: 'Invalid type: expected integer value',
-    row: 1 },
-  { type: 'FieldMismatch',
-    code: 'InvalidType',
-    message: 'Invalid type: expected formmated date',
-    row: 2 },
-  { type: 'ConstraintsError',
-    code: 'MissingField',
-    message: 'Missing field: the field "d" requires a value',
-    row: 3 } ]
-*/
-
   const r = {
     mediatype: 'text/csv',
     content,

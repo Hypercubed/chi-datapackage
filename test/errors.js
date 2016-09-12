@@ -3,11 +3,6 @@ import test from 'ava';
 
 import dp from '../';
 
-/* test('missing package', async t => {
-  const p = await load('./fixtures/inline/datapackage.json');
-
-}); */
-
 test('loader, fetch required', async t => {
   t.throws(() => {
     new dp.loader.constructor(); // eslint-disable-line no-new
