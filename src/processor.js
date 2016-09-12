@@ -1,13 +1,13 @@
 'use strict';
 
 const assert = require('assert');
-const deepExtend = require('deep-extend');
+const merge = require('lodash.merge');
 
 class Processor {
   constructor (opts) {
     assert(opts && typeof opts.translators === 'object', 'opts.translators is required.');
     assert(opts && typeof opts.schemaProcessor === 'object', 'opts.schemaProcessor is required.');
-    this.translators = deepExtend({}, opts.translators);
+    this.translators = merge({}, opts.translators);
     this.schemaProcessor = opts.schemaProcessor;
   }
 

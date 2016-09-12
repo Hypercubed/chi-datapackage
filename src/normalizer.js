@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const urijs = require('urijs');
-const deepExtend = require('deep-extend');
+const merge = require('lodash.merge');
 const cuid = require('cuid');
 
 class Normalizer {
@@ -17,7 +17,7 @@ class Normalizer {
     const dir = uri.normalizePathname().directory();
     const base = path;
 
-    const normalized = deepExtend({
+    const normalized = merge({
       path,
       base,
       name: dir,
@@ -41,7 +41,7 @@ class Normalizer {
       resource = {path: resource};
     }
 
-    resource = deepExtend({}, resource);
+    resource = merge({}, resource);
 
     if (resource.path || resource.url) {
       const uri = urijs(resource.path || resource.url);

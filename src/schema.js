@@ -1,7 +1,7 @@
 'use strict';
 
 const assert = require('assert');
-const deepExtend = require('deep-extend');
+const merge = require('lodash.merge');
 const pointers = require('./lib/pointers');
 
 // Note: some code based on https://github.com/frictionlessdata/datapackage-render-js/blob/master/datapackage.js
@@ -21,7 +21,7 @@ function nullCheck (mv, fn) {
 class Schema {
   constructor (opts) {
     assert(opts && typeof opts.types === 'object', 'opts.types is required.');
-    this.types = deepExtend({}, opts.types);
+    this.types = merge({}, opts.types);
   }
 
   normalizeField (field) {
@@ -102,7 +102,7 @@ class Schema {
     const processedData = [];
 
     resource.data.forEach((d, i) => {
-      const r = deepExtend({}, d);
+      const r = merge({}, d);
       const errors = [];
       fields.forEach(field => {
         const key = field.name;
