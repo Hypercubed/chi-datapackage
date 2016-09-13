@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* Fix for enviroments that don't support for const in
+_(none)_
 
 --------------------
+
+## 4.0.1 (2016-09-13)
+* Fix for enviroments that don't support for const in
 
 ## 4.0.0 (2016-09-12)
 * read and fetch as seperate options for Loader
