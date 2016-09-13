@@ -40,7 +40,7 @@ class DataPackageService {
   normalizeSchemas (p) {
     p.resources.forEach(r => this.schemaProcessor.normalizeResource(p, r));
 
-    for (const key in p.schemas) {
+    for (let key in p.schemas) { // eslint-disable-line prefer-const
       if (Object.prototype.hasOwnProperty.call(p.schemas, key)) {
         p.schemas[key].key = p.schemas[key].key || key;
         p.schemas[key].fields = p.schemas[key].fields.map(f => this.schemaProcessor.normalizeField(f));
