@@ -68,7 +68,6 @@ class DataPackageService {
     try {
       Object.assign(r, this.processor.resource(r));
       if (r.errors && r.errors.length > 0) {
-        console.log('asdfasdfsdf');
         r.$error = new Error(`Errors processing resource ${r.name}`);
       }
     } catch (err) {
