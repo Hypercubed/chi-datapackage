@@ -6,6 +6,9 @@ _(none)_
 
 --------------------
 
+## 4.0.2 (2016-09-22)
+_(none)_
+
 ## 4.0.1 (2016-09-13)
 * Fix for enviroments that don't support for const in
 
