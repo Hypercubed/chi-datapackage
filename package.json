@@ -36,6 +36,7 @@
       "node"
     ],
     "rules": {
+      "no-console": "warn",
       "node/no-unsupported-features": [
         2,
         {
