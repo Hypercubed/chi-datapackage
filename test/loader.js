@@ -32,6 +32,18 @@ test('loader, resources', async t => {
   t.deepEqual(r[3].content.trim(), tsv);
 });
 
+test('loader, resources, overwrites current resources', async t => {
+  const s = {url: 'fixtures/loaded/', resources: ['some', 'junk']};
+  const p = await dp.loader.datapackage(s);
+  const r = await dp.loader.resources(p.resources.map(r => dp.normalize.resource(p, r)));
+
+  t.deepEqual(r[0].content, 'hello\n');
+  t.deepEqual(r[1].content.trim(), csv);
+
+  t.deepEqual(r[2].content.trim(), tsv);
+  t.deepEqual(r[3].content.trim(), tsv);
+});
+
 ['fixtures/gdp/', 'http://github.com/datasets/gdp', {url: 'http://github.com/datasets/gdp'}].forEach(s => {
   test(`loader, url, ${s}`, async t => {
     await setupHttp();

@@ -60,6 +60,8 @@ class Loader {
     const url = id.dataPackageJsonUrl;
     id.base = id.url;
 
+    datapackage = Object.assign({}, datapackage, id);
+
     if (!url) {
       return Promise.resolve(datapackage);
     }
@@ -73,7 +75,7 @@ class Loader {
         throw err;
       })
       .then(JSON5.parse)
-      .then(res => Object.assign(res, datapackage, id));
+      .then(res => Object.assign(datapackage, res));
   }
 
   resources (resources) {
