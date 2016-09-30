@@ -22,9 +22,9 @@
       "path": "two.csv",
       "schema": {
         "fields": [
-          {"name": "A", "type": "string"},
-          {"name": "B", "type": "number"},
-          {"name": "C", "type": "number"}
+          {"name": "A", "type": "string", "constraints": {"required": true}},
+          {"name": "B", "type": "number", "constraints": {"required": true}},
+          {"name": "C", "type": "number", "constraints": {"required": true}}
         ]
       }
     },
