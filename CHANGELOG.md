@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* Added observable Data Package store using mobx
+_(none)_
 
 --------------------
+
+## 5.0.0 (2016-09-30)
+* Added observable Data Package store using mobx
 
 ## 4.0.2 (2016-09-22)
 _(none)_
