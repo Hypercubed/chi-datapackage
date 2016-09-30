@@ -102,7 +102,7 @@ class Schema {
     const processedData = [];
 
     resource.data.forEach((d, i) => {
-      const r = merge({}, d);
+      const r = Object.assign({}, d);
       const errors = [];
       fields.forEach(field => {
         const key = field.name;

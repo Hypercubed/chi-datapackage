@@ -1,5 +1,6 @@
 const nodePath = require('path');
 const readFile = require('fs').readFile;
+
 const fetchUrl = require('isomorphic-fetch');
 const debug = require('debug')('fetch');
 

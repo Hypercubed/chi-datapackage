@@ -2,8 +2,11 @@
 
 const assert = require('assert');
 const urijs = require('urijs');
-const merge = require('lodash.merge');
 const cuid = require('cuid');
+const debug = require('debug')('Normalizer');
+
+const resolve = require('./lib/resolve');
+const normalizeObject = require('./lib/utils').normalizeObject;
 
 class Normalizer {
   constructor (opts) {
@@ -12,20 +15,27 @@ class Normalizer {
   }
 
   datapackage (datapackage) {
-    const path = datapackage.path || datapackage.url;
+    debug('Normalizing datapackage', datapackage);
+    datapackage = normalizeObject(datapackage);
+
+    const path = datapackage.path || datapackage.url; // TODO: move into resolve.datapackage
     const uri = urijs(path);
     const dir = uri.normalizePathname().directory();
     const base = path;
 
-    const normalized = merge({
+    const normalized = Object.assign({
       path,
       base,
       name: dir,
-      resources: [],
       homepage: base,
       description: '',
       schemas: {}
-    }, datapackage);
+    }, datapackage, {
+      resources: datapackage.resources ? datapackage.resources.slice() : []
+    });
+
+    const id = resolve.datapackage(normalized);
+    Object.assign(normalized, id, {base: id.url});
 
     ['image', 'readme'].forEach(key => {
       if (Object.prototype.hasOwnProperty.call(normalized, key)) {
@@ -37,13 +47,9 @@ class Normalizer {
   }
 
   resource (datapackage, resource) {
-    if (typeof resource === 'string') {
-      resource = {path: resource};
-    }
+    resource = normalizeObject(resource);
 
-    resource = merge({}, resource);
-
-    if (resource.path || resource.url) {
+    if (resource.path || resource.url) {  // TODO: move into resolve.resource
       const uri = urijs(resource.path || resource.url);
 
       resource.format = resource.format || uri.suffix();
@@ -64,18 +70,16 @@ class Normalizer {
 
     return resource;
   }
-}
 
-function getResourceIndex (datapackage) {
-  const $resourcesByName = {};
-  datapackage.resources.forEach(r => {
-    if (r.name) {
-      $resourcesByName[r.name] = r;
-    }
-  });
-  return $resourcesByName;
+  static index (datapackage) {
+    const $resourcesByName = {};
+    datapackage.resources.forEach(r => {
+      if (r.name) {
+        $resourcesByName[r.name] = r;
+      }
+    });
+    return $resourcesByName;
+  }
 }
-
-Normalizer.index = getResourceIndex;
 
 module.exports = Normalizer;
