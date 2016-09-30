@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* Fix Block-scoped declarations (let, const, function, class) not yet supported outside strict mode
+_(none)_
 
 --------------------
+
+## 5.0.1 (2016-09-30)
+* Fix Block-scoped declarations (let, const, function, class) not yet supported outside strict mode
 
 ## 5.0.0 (2016-09-30)
 * Added observable Data Package store using mobx
