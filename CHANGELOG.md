@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* Fix Block-scoped declarations (let, const, function, class) not yet supported outside strict mode
 
 --------------------
 

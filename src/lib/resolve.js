@@ -1,3 +1,5 @@
+'use strict';
+
 const nodePath = require('path');
 // const urijs = require('urijs');
 // const debug = require('debug')('resolve');
