@@ -77,6 +77,37 @@ test('load a data package', async t => {
   t.deepEqual(Object.keys(datapackage.$resourcesByName), resourceNames);
 });
 
+test('create a data package with inline data', async t => {
+  const datapackage = await makePackage('fixtures/inline/').load();
+  const resources = datapackage.resources;
+
+  t.is(resources.length, 11);
+
+  t.deepEqual(resources[0].data, 'hello\n');
+  t.is(typeof resources[0].data, 'string');
+  t.is(resources[0].$processedCount, 1);
+
+  [1, 2].forEach(i => {
+    t.deepEqual(resources[i].data, json);
+    t.true(Array.isArray(resources[i].data));
+    t.is(resources[i].$processedCount, 1);
+  });
+
+  [3, 4].forEach(i => {
+    t.deepEqual(resources[i].data, matrix);
+    t.true(isPlainObject(resources[i].data));
+    t.is(resources[i].$processedCount, 1);
+  });
+
+  [5, 6, 7, 8, 9, 10].forEach(i => {
+    t.deepEqual(resources[i].data, jsonProcessed);
+    t.true(Array.isArray(resources[i].data));
+    t.is(resources[i].$processedCount, 1);
+  });
+
+  t.is(Object.keys(datapackage.$resourcesByName).length, 11);
+});
+
 test('add a new resource', async t => {
   const datapackage = await makePackage('fixtures/loaded/').load();
 

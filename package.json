@@ -2,7 +2,8 @@
   "name": "chi-datapackage",
   "version": "5.0.1",
   "description": "Normalize datapackage and datapackage resources",
-  "main": "index.js",
+  "main": "src/index.js",
+  "browser": "dist/index.js",
   "files": [
     "src",
     "dist"

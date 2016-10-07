@@ -3,7 +3,7 @@
 [![NPM version][npm-image]][npm-url]
 [![Build Status][travis-image]][travis-url]
 
-> A utility library for working with [datapackage files](http://frictionlessdata.io/guides/data-package/) in Node and the browser.
+> A utility library for working with [Data Package files](http://frictionlessdata.io/guides/data-package/) in Node and the browser.
 > Designed for use in [Project χ](https://github.com/Hypercubed/Project-Chi).
 
 ## Features
@@ -13,6 +13,7 @@
 * Resource translators (tsv, csv, yaml, json, etc).
 * JSON Table Schema processor (include type casting).
 * Customizable loader, mime-types, translators, and data-types.
+* Generates an observable Data Package data store.
 
 ## Goals
 
@@ -37,7 +38,7 @@ jspm npm:chi-datapackage
 ```js
 import dp from 'chi-datapackage';
 
-dp.load('//datapackage/path/or/url')
+dp.makePackage('//datapackage/path/or/url').load()
   .then(datapackage => {
     /* so something */
   });

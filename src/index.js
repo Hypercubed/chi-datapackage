@@ -1,5 +1,5 @@
-const store = require('./src/store');
-const Normalizer = require('./src/normalizer');
+const store = require('./store');
+const Normalizer = require('./normalizer');
 
 const dataPackageService = store.dataPackageService;
 

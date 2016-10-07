@@ -6,6 +6,7 @@ const mobx = require('mobx');
 
 const Normalizer = require('./normalizer');
 const DataPackageService = require('./service');
+const makeNonEnumerable = require('./lib/utils').makeNonEnumerable;
 
 const dataPackageService = new DataPackageService();
 
@@ -22,21 +23,6 @@ const normalize = dataPackageService.normalize;
 const processor = dataPackageService.processor;
 const loader = dataPackageService.loader;
 
-function makeNonEnumerable (object, propNames) {
-  for (let i = 0; i < propNames.length; i++) {
-    addHiddenProp(object, propNames[i], object[propNames[i]]);
-  }
-}
-
-function addHiddenProp (object, propName, value) {
-  Object.defineProperty(object, propName, {
-    enumerable: false,
-    writable: true,
-    configurable: true,
-    value
-  });
-}
-
 const makeResources = (datapackage, resources) =>
   (resources || datapackage.resources).map(resource => makeResource(datapackage, resource));
 
@@ -44,58 +30,61 @@ class Resource {
   constructor (_datapackage_, _resource_) {
     _resource_ = normalize.resource(_datapackage_, _resource_);
 
+    const _data_ = _resource_.data;
+    delete _resource_.data;
+
     const store = extendObservable(this, _resource_, {
       content: _resource_.content || '',
       $error: null,
       errors: [],
       $valid: true,
       $processedCount: 0,
-      data: asReference(''),
-      update: action(data => {
-        debug('update', data.name);
-        data = isObservable(data) ? toJS(data) : data;
-        Object.assign(data, {
+      data: asReference(_data_),
+      update: action(state => {
+        debug('update', state.name);
+        state = isObservable(state) ? toJS(state) : state;
+        Object.assign(state, {
           name: store.name
-        }, data);
-        data = normalize.resource(_datapackage_, data);
-        schemaProcessor.normalizeResource(_datapackage_, data);
-        return Object.assign(this, data);
+        }, state);
+        state = normalize.resource(_datapackage_, state);
+        schemaProcessor.normalizeResource(_datapackage_, state);
+        return Object.assign(this, state);
         // return this.updateData(Object.assign(this, data));
       }),
-      updateData: action(data => {
-        debug('updateData', data.name);
+      updateData: action(state => {
+        debug('updateData', state.name);
         try {
           this.$processedCount++;
-          data = processor.resource(data);
-          if (data.errors && data.errors.length > 0) {
-            data.$error = new Error(`Errors processing resource ${data.name}`);
+          state = processor.resource(state);
+          if (state.errors && state.errors.length > 0) {
+            state.$error = new Error(`Errors processing resource ${state.name}`);
           }
         } catch (err) {
-          data.$error = err;
-          data.errors = data.errors || [];
-          data.errors.shift({
+          state.$error = err;
+          state.errors = state.errors || [];
+          state.errors.shift({
             code: 'Parsing',
             type: err.name,
             message: `Parsing error: ${err.message}`
           });
         }
 
-        if (data.$error || data.errors.length > 0) {
-          this.errors = data.errors;
-          this.$error = data.$error;
+        if (state.$error || state.errors.length > 0) {
+          this.errors = state.errors;
+          this.$error = state.$error;
           this.$error.message = this.name;
           this.$valid = false;
         } else {
           this.errors = [];
           this.$error = null;
-          this.data = data.data;
+          this.data = state.data;
           this.$lastValidContent = this.content;
         }
         return this;
       }),
       get core () {
         return {
-          name: store.name,
+          name: mobx.untracked(() => store.name),
           content: store.content,
           schema: store.schema,
           mediatype: store.mediatype,
@@ -103,7 +92,7 @@ class Resource {
           dialect: store.dialect,
           $error: null,
           errors: [],
-          data: []
+          data: mobx.untracked(() => store.data)
         };
       }
     });
@@ -117,15 +106,21 @@ class Resource {
     ]);
 
     store.update(store);
+    store.updateData(store.core);
+    store.start();
+  }
 
-    reaction(
-      () => (store.core),
-      data => {
-        debug('update *reaction*', data.name);
-        store.updateData(data);
-      },
-      true
+  start () {
+    this.stop = reaction(
+      () => (this.core),
+      data => this.updateData(data)
     );
+
+    return this.stop;
+  }
+
+  stop () {
+    // noop
   }
 
   load () {  // TODO: test
@@ -146,6 +141,9 @@ class Package {
 
     _datapackage_ = normalize.datapackage(_datapackage_);
 
+    const resources = _datapackage_.resources;
+    const schemas = _datapackage_.schemas;
+
     delete _datapackage_.resources;
     delete _datapackage_.schemas;
     delete _datapackage_.$resourcesByName;
@@ -153,8 +151,8 @@ class Package {
     const store = extendObservable(this, _datapackage_, {
       $isLoadingPackage: false,
       $isLoadingResources: false,
-      resources: asFlat(makeResources(_datapackage_, [])),
-      // schemas: asReference({}),
+      resources: asFlat(makeResources(_datapackage_, resources)),
+      schemas: asReference(schemas),
       get $resourcesByName () {
         return Normalizer.index(this);
       },
@@ -218,7 +216,12 @@ class Package {
       'addResource'
     ]);
 
-    this.stop$resourcesByName = keepAlive(store, '$resourcesByName');
+    store.start();
+  }
+
+  start () {
+    this.stop = keepAlive(this, '$resourcesByName');
+    return this.stop;
   }
 
   updateResource (resource) {
