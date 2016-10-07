@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* Fix errors when data is defined inline
+_(none)_
 
 --------------------
+
+## 5.0.2 (2016-10-07)
+* Fix errors when data is defined inline
 
 ## 5.0.1 (2016-09-30)
 * Fix Block-scoped declarations (let, const, function, class) not yet supported outside strict mode
