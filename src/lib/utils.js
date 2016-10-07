@@ -1,4 +1,3 @@
-
 function normalizeObject (obj) {
   if (typeof obj === 'string') {
     return {path: obj};
@@ -9,7 +8,7 @@ function normalizeObject (obj) {
 }
 
 function makeNonEnumerable (object, propNames) {
-  for (let i = 0; i < propNames.length; i++) {
+  for (var i = 0; i < propNames.length; i++) { // eslint-disable-line no-var
     addHiddenProp(object, propNames[i], object[propNames[i]]);
   }
 }
