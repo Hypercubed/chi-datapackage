@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* Fix block scope incompat with node v4
+_(none)_
 
 --------------------
+
+## 5.0.3 (2016-10-07)
+* Fix block scope incompat with node v4
 
 ## 5.0.2 (2016-10-07)
 * Fix errors when data is defined inline
