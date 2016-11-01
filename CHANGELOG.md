@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* Update dependencies
+_(none)_
 
 --------------------
+
+## 5.0.4 (2016-11-01)
+* Update dependencies
 
 ## 5.0.3 (2016-10-07)
 * Fix block scope incompat with node v4
