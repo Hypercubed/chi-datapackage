@@ -5,7 +5,7 @@ const nodePath = require('path');
 // const debug = require('debug')('resolve');
 const identifier = require('datapackage-identifier');
 
-const absURLRegEx = /^([^\/]+:\/\/|\/)/;
+const absURLRegEx = /^([^/]+:\/\/|\/)/;
 const backSlashPattern = /\\/g;
 
 const path = (() => {

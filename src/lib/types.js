@@ -59,7 +59,7 @@ function castNumber (value) {
 }
 
 function castInt (value) {
-  if (/^(\-|\+)?([0-9]+|Infinity)$/.test(String(value))) {
+  if (/^(-|\+)?([0-9]+|Infinity)$/.test(String(value))) {
     return castNumber(value);
   }
   throw new Error(`${INVALID_TYPE}: expected integer value`);
