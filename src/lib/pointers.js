@@ -2,7 +2,7 @@ const jsonpointer = require('jsonpointer');
 
 const badPtrTokenRegex = /~(?:[^01]|$)/g;
 
-module.exports.isPointer = function isPointer (ptr) {
+module.exports.isPointer = function (ptr) {
   if (typeof ptr !== 'string') {
     return false;
   }
@@ -20,7 +20,7 @@ module.exports.isPointer = function isPointer (ptr) {
   return true;
 };
 
-module.exports.get = function get (obj, ptr) {
+module.exports.get = function (obj, ptr) {
   ptr = ptr.replace(/^#/, '');
   return jsonpointer.get(obj, ptr);
 };

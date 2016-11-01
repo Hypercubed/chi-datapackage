@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* Update dependencies
 
 --------------------
 
@@ -22,11 +22,11 @@ _(none)_
 _(none)_
 
 ## 4.0.1 (2016-09-13)
-* Fix for enviroments that don't support for const in
+* Fix for environments that don't support for const in
 
 ## 4.0.0 (2016-09-12)
-* read and fetch as seperate options for Loader
-* Add seperate JSON and JSON5 types
+* read and fetch as separate options for Loader
+* Add separate JSON and JSON5 types
 * Improved error handling
 
 ## 3.1.0 (2016-09-06)

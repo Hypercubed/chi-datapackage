@@ -4,7 +4,7 @@ const readFile = require('fs').readFile;
 const fetchUrl = require('isomorphic-fetch');
 const debug = require('debug')('fetch');
 
-module.exports.read = function read (path) {
+module.exports.read = function (path) {
   if (nodePath.sep === '\\') {
     path = nodePath.normalize(path).replace(/^\\/, '');
   }
@@ -19,7 +19,7 @@ module.exports.read = function read (path) {
   });
 };
 
-module.exports.fetch = function fetch (url) {
+module.exports.fetch = function (url) {
   debug('fetching', url);
   return fetchUrl(url)
     .then(response => {

@@ -43,8 +43,8 @@ const matrix = {
     t.deepEqual(p.resources[0].data[0], {
       'Country Name': 'Arab World',
       'Country Code': 'ARB',
-      'Year': new Date('1968'),
-      'Value': 25659088715.414
+      Year: new Date('1968'),
+      Value: 25659088715.414
     });
   });
 });

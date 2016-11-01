@@ -9,13 +9,15 @@ const absURLRegEx = /^([^\/]+:\/\/|\/)/;
 const backSlashPattern = /\\/g;
 
 const path = (() => {
-  /* istanbul ignore next , in browser*/
+  /* istanbul ignore next , in browser */
   if (typeof document !== 'undefined') {
-    return function resolve (url) {
+    return function (url) {
       const div = document.createElement('div');
       div.innerHTML = '<a></a>';
       div.firstChild.href = url; // Ensures that the href is properly escaped
-      div.innerHTML = div.innerHTML; // Run the current innerHTML back through the parser
+
+      // Run the current innerHTML back through the parser
+      div.innerHTML = div.innerHTML; // eslint-disable-line no-self-assign
       return div.firstChild.href;
     };
   }
