@@ -42,7 +42,11 @@ function datapackage (datapackage) {
       dataPackageJsonUrl: url
     };
   }
-  return identifier.parse(url);
+  const id = identifier.parse(url);
+  if (id.version === '') {
+    delete id.version;
+  }
+  return id;
 }
 
 module.exports = {

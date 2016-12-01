@@ -1,5 +1,6 @@
 {
   "name": "content",
+  "version":  "1",
   "resources": [
     {
       "format": "txt",
