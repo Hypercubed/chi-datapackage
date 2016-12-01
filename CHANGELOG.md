@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* Fix loaded datapackages lose version
+_(none)_
 
 --------------------
+
+## 5.0.5 (2016-12-01)
+* Fix loaded datapackages lose version
 
 ## 5.0.4 (2016-11-01)
 * Update dependencies
